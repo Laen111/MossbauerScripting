@@ -45,6 +45,12 @@ def fitting(dXs, dYs, eYs=None, initGuess=None, guessBounds=None):
 	popt, pcov = curve_fit(func, dXs, dYs, p0=initGuess, sigma=eYs)
 	return popt, pcov
 
+# basically the above function but it returns only the y values from the fit
+def fitYs(dXs, dYs, initGuess=None):
+	popt,pcov = fitting(dXs, dYs, eYs=None, initGuess=initGuess, guessBounds=None)
+	fitYs = func(dXs,popt[0],popt[1],popt[2])
+	return fitYs
+
 # creates test data to fit to using func and Y error provied
 # params is an array of paramters to use according to func()
 def testData(dXs, params, errY=1.0, seed=25478):
