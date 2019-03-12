@@ -32,8 +32,9 @@ def cutData(Xs, Ys, interval=[0,None], cutOn="x"):
 
 
 # the function that scipy will use to fit to
-def func(x, m, b):
-	return m*x + b
+# x0 is position of minimum, d is depth of minimum, a is vertical offset
+def func(x,x0,d,a):
+	return(((1/(np.pi*(-1/(np.pi)**(1.0/3.0))))/(((x-x0)**2)+(1/(np.pi)**(2.0/3.0))))+a)
 
 # fitting making use of scipy curve_fit
 # dXs, dYs are arrays of the data to be fit
@@ -41,7 +42,7 @@ def func(x, m, b):
 # initGuess is the inital guess for the algorithm, tweak if getting errors (array entry for each param in func)
 # guessBounds gives limits for the algorithm eg, guessBounds=(0,[4,7]) says param1 can search 0to4 and param2 can search 0to7
 def fitting(dXs, dYs, eYs=None, initGuess=None, guessBounds=None):
-	popt, pcov = curve_fit(func, dX, dYs, sigma=eYs)
+	popt, pcov = curve_fit(lorentz, dXs, dYs, p0=initGuess, sigma=eYs)
 	return popt, pcov
 
 # creates test data to fit to using func and Y error provied
@@ -52,3 +53,7 @@ def testData(dXs, params, errY=1.0, seed=25478):
 	for x in dXs:
 		dYs.append(np.random.normal(loc=func(x,*params), scale=errY))
 	return dYs
+
+xs = np.linspace(-10,10,500)
+ys = testData(xs,[1,1,100])
+
