@@ -49,8 +49,8 @@ def genPeaks(params1, params2, params3):
 # test data of six (three mirrored) peaks written to file and plotted from file
 testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1,100])
 f = open(dataFolder+"testsixpeaks.dat","w+")
-for i in range(len(testx)):
-	f.write(str(testx[i])+"	"+str(testy[i])+"\n")
+for i in range(len(testX)):
+	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
 f.close()
 
 sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
