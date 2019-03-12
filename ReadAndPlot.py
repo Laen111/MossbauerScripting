@@ -35,7 +35,9 @@ def readColumnFile(filename, header=0):
 	file.close()
 	return allData
 
-def plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"Default Title"):
+# initalizes a plot, give axes labels and title
+# chose linear or log scale ad limits for x and y axes
+def plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"Default Title", xLim=None, yLim=None, xLog=False, yLog=False):
 	plot.clf()
 	ax = plot.subplot(111)
 	# make a legend off the plot
@@ -44,18 +46,28 @@ def plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"Default Titl
 	ax.set_position([box.x0, box.y0, box.width * 0.8, box.height])
 	# Put a legend to the right of the current axis
 	plot.grid()
-	#plot.yscale('log')
-	#plot.xlim(0,1)
-	#plot.ylim(10**-34, 10**-1)
+	if xLog:
+		plot.xscale('log')
+	if yLog:
+		plot.yscale('log')
+	if xLim!=None:
+		plot.xlim(xLim[0],xLim[1])
+	if yLim!=None:
+		plot.ylim(xLim[0],xLim[1])
 	plot.xlabel(xAx)
 	plot.ylabel(yAx)
 	plot.title(plotTitle)
 
 # call for as much data as you want
-def plotData(dXs, dYs, eXs, eYs, dataLabel=r"default", colour="Blue", rescaleX=1, rescaleY=1):
+# error bars won't appear if set to zero
+# scatter to false will plot lines
+def plotData(dXs, dYs, eXs=0, eYs=0, dataLabel=r"default", colour="Blue", lines=False, rescaleX=1, rescaleY=1):
 	ax = plot.subplot(111)
-	#plot.plot(dXs, dYs, label=dataLabel, color=colour, marker='.', linewidth=0.5, markersize=0.8)
-	plot.errorbar(dXs, dYs, xerr=eXs, yerr=eYs, label=dataLabel, fmt='none', ecolor=colour, elinewidth=None, capsize=None, barsabove=False, lolims=False, uplims=False, xlolims=False, xuplims=False, errorevery=1, capthick=None)
+	if lines:
+		plot.plot(dXs, dYs, label=dataLabel, color=colour, marker='', linestyle='-', linewidth=0.8)
+	else:
+		plot.plot(dXs, dYs, label=dataLabel, color=colour, marker='.', linestyle='', markersize=0.8)
+	plot.errorbar(dXs, dYs, xerr=eXs, yerr=eYs, ecolor=colour, fmt='none', elinewidth=0.5)
 	ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 # call once to show the plot
