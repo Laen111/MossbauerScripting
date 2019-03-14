@@ -58,6 +58,7 @@ Xs, Ys = sixdat[0], sixdat[1]
 rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"test six lorentzians")
 rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
 rp.plotOutput(plotsFolder+"testsixpeaks.png")
+rp.plotOutput()
 
 
 # quick simple lorentzian line shape test data written to file and plotted from file
@@ -74,3 +75,4 @@ Xs, Ys = dat[0], dat[1]
 rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"plotting test data")
 rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
 rp.plotOutput(plotsFolder+"testplot.png")
+rp.plotOutput()
