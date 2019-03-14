@@ -8,6 +8,7 @@ import FittingData as fd
 import ReadAndPlot as rp
 from uncertainties import ufloat
 from uncertainties import unumpy
+import matplotlib.pyplot as plt
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Constants
@@ -16,8 +17,8 @@ from uncertainties import unumpy
 h = 6.62607015*10**(-34) #Js
 e = 1.602176634*10**(-19) #C
 
-dataFolder = "./Data/"
-plotsFolder = "./Plots/"
+dataFolder = "C:/Users/Jake/Desktop/Mossbauer Lab Stuff/Data/"
+plotsFolder = "C:/Users/Jake/Desktop/Mossbauer Lab Stuff/Plots/"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Functions
@@ -29,7 +30,7 @@ plotsFolder = "./Plots/"
 #Error on peaks can be changed manually
 def genPeaks(params1, params2, params3):
 	#x ranges can be changed manually (didn't want to clutter up function arguments)
-	x1 = np.linspace(-10,10,500)
+	x1 = np.linspace(-10,10,5000)
 	#Sets vertical offset to 0 to add them all up, then later avg. vertical offset is added back
 	nparams1, nparams2, nparams3 = [params1[0], params1[1], 0], [params2[0], params2[1], 0], [params3[0], params3[1], 0]
 	y1 = fd.testData(x1, nparams1, errY = 0.05)
@@ -47,7 +48,7 @@ def genPeaks(params1, params2, params3):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # test data of six (three mirrored) peaks written to file and plotted from file
-testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1,100])
+testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1.7,100])
 f = open(dataFolder+"testsixpeaks.dat","w+")
 for i in range(len(testX)):
 	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
