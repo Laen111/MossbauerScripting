@@ -29,7 +29,7 @@ plotsFolder = "./Plots/"
 #Error on peaks can be changed manually
 def genPeaks(params1, params2, params3):
 	#x ranges can be changed manually (didn't want to clutter up function arguments)
-	x1 = np.linspace(-10,10,500)
+	x1 = np.linspace(-10,10,5000)
 	#Sets vertical offset to 0 to add them all up, then later avg. vertical offset is added back
 	nparams1, nparams2, nparams3 = [params1[0], params1[1], 0], [params2[0], params2[1], 0], [params3[0], params3[1], 0]
 	y1 = fd.testData(x1, nparams1, errY = 0.05)
@@ -51,11 +51,16 @@ def readCSV(filename):
 	yCounts = [data[i] for i in range(1,len(data))]
 	return [xBins, yCounts, totalCount]
 
+def rel(listy):
+	return range(len(listy))
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Scripting
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+
+#################### This is the code to create the test data files ##########################
 # test data of six (three mirrored) peaks written to file and plotted from file
 testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1,100])
 f = open(dataFolder+"testsixpeaks.dat","w+")
@@ -63,26 +68,53 @@ for i in range(len(testX)):
 	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
 f.close()
 
+# sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
+# Xs, Ys = sixdat[0], sixdat[1]
+# rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"test six lorentzians")
+# rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
+# rp.plotOutput(plotsFolder+"testsixpeaks.png")
+
+
+# # quick simple lorentzian line shape test data written to file and plotted from file
+# xData = [i*0.1 for i in range(0,100)]
+# yData = fd.testData(xData, [5,3,10], errY=0.005, seed=30054)
+
+# f = open(dataFolder+"testdata.dat","w+")
+# for i in range(len(xData)):
+# 	f.write(str(xData[i])+"	"+str(yData[i])+"\n")
+# f.close()
+
+# dat = rp.readColumnFile(dataFolder+"testdata.dat")
+# Xs, Ys = dat[0], dat[1]
+# rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"plotting test data")
+# rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
+# rp.plotOutput(plotsFolder+"testplot.png")
+#################### End of code to create the test data files ###############################
+
+# Read and plot the test data with 6 Lorentzians
 sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
 Xs, Ys = sixdat[0], sixdat[1]
-rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"test six lorentzians")
-rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
-rp.plotOutput(plotsFolder+"testsixpeaks.png")
+rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"test six Lorentzians")
+rp.plotData(Xs, Ys, 0, 0, dataLabel=r"Data", colour="Blue")
+
+# Let's try fitting this data
+# peaks are in [-10,-6.5],[-6.5,-3],[-3,0],[0,3],[3,6.5],[6.5,10]
+
+cuts = [[-10,-6.5],[-6.5,-3],[-3,0],[0,3],[3,6.5],[6.5,10]]
+guesses = [[-7.6,5,100],[-5,3,100],[-2,1,100],[2,1,100],[5,3,100],[7.6,5,100]]
+for i in rel(cuts):
+	x,y = fd.cutData(Xs,Ys,interval = cuts[i])
+	guess = guesses[i]
+	fitys = fd.fitYs(x, y, initGuess=guess)
+	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
+
 rp.plotOutput()
 
 
-# quick simple lorentzian line shape test data written to file and plotted from file
-xData = [i*0.1 for i in range(0,100)]
-yData = fd.testData(xData, [5,3,10], errY=0.005, seed=30054)
+# dat = rp.readColumnFile(dataFolder+"testdata.dat")
+# Xs, Ys = dat[0], dat[1]
+# rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"plotting test data")
+# rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
+# rp.plotOutput(plotsFolder+"testplot.png")
 
-f = open(dataFolder+"testdata.dat","w+")
-for i in range(len(xData)):
-	f.write(str(xData[i])+"	"+str(yData[i])+"\n")
-f.close()
 
-dat = rp.readColumnFile(dataFolder+"testdata.dat")
-Xs, Ys = dat[0], dat[1]
-rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"plotting test data")
-rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
-rp.plotOutput(plotsFolder+"testplot.png")
-rp.plotOutput()
