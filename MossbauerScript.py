@@ -41,6 +41,16 @@ def genPeaks(params1, params2, params3):
 
 	return x1, yALL
 
+# reads from the .csv file MossbauerDAQ.vi writes
+# the header is the total number of counts
+# returns bin number, count number (in that bin), and total counts
+def readCSV(filename):
+	data = rp.readColumnFile(filename)
+	totalCount = data[0]
+	xBins = [i for i in (len(data)-1)]
+	yCounts = [data[i] for i in range(1,len(data))]
+	return [xBins, yCounts, totalCount]
+
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Scripting
