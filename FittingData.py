@@ -36,7 +36,9 @@ def cutData(Xs, Ys, interval=[0,None], cutOn="x"):
 def func(x,x0,d,a):
 	numerator = -1/np.pi * (np.pi*d)**(1/3)
 	denominator = (x-x0)**2 + (np.pi*d)**(-2/3)
-	return numerator/denominator + a#return(((1/(np.pi*(-1/(np.pi*d)**(1.0/3.0))))/(((x-x0)**2)+(1/(np.pi*d)**(2.0/3.0))))+a)
+	return numerator/denominator + a
+
+# test edit 
 
 # fitting making use of scipy curve_fit
 # dXs, dYs are arrays of the data to be fit
