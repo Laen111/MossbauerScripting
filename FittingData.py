@@ -38,8 +38,6 @@ def func(x,x0,d,a):
 	denominator = (x-x0)**2 + (np.pi*d)**(-2/3)
 	return numerator/denominator + a
 
-# test edit 
-
 # fitting making use of scipy curve_fit
 # dXs, dYs are arrays of the data to be fit
 # eYs is the error on Y measurements (a single value, or array of different errors)
