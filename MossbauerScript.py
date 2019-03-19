@@ -70,7 +70,7 @@ def fitOneLorentzian(xData, yData, cut=[0,1]):
 	peakDepth = peakHeight - min(cutY)
 	popt, pcov = fd.fitting(xData, yData, eYs=None, initGuess=[peakPos,peakDepth,peakHeight])
 	fitY = fd.fitYs(cutX, popt)
-	return [cutX, fitY]
+	return [cutX, fitY, popt, pcov]
 
 def convertToVelocity(xBins, lims=[-11,11]):
 	newXPoints = np.linspace(lims[0],lims[1],num=len(xBins))
@@ -183,12 +183,11 @@ guesses = [[6.5, 70, 100],
 		[-4.5, 65, 100]]
 
 
-rp.plotOutput()
+#rp.plotOutput()
 
 # Plot Fits:
 for i in rel(cuts):
-	fits = fitOneLorentzian(xData, yData, cut=cuts[i])
-	fitX, fitY = fits[0], fits[1]
+	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, cut=cuts[i])
 	if i == 0:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit data", colour="Green", lines=True)
 	else:
