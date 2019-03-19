@@ -8,6 +8,7 @@ import FittingData as fd
 import ReadAndPlot as rp
 from uncertainties import ufloat
 from uncertainties import unumpy
+import matplotlib.pyplot as plt
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Constants
@@ -81,13 +82,16 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-#################### This is the code to create the test data files ##########################
-# test data of six (three mirrored) peaks written to file and plotted from file
-# testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1,100])
+# ################### This is the code to create the test data files ##########################
+# #test data of six (three mirrored) peaks written to file and plotted from file
+
+# testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1.7,100])
 # f = open(dataFolder+"testsixpeaks.dat","w+")
-# for i in rel(testX):
+# for i in range(len(testX)):
 # 	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
 # f.close()
+
+
 
 # sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
 # Xs, Ys = sixdat[0], sixdat[1]
@@ -110,9 +114,10 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"plotting test data")
 # rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
 # rp.plotOutput(plotsFolder+"testplot.png")
-#################### End of code to create the test data files ###############################
+# ################### End of code to create the test data files ###############################
 
-#################### Fit six Lorentzians ####################
+
+# #################### Fit six Lorentzians ####################
 # # Read and plot the test data with 6 Lorentzians
 # sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
 # Xs, Ys = sixdat[0], sixdat[1]
@@ -130,15 +135,14 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # 	fitys = fd.fitYs(x, y, initGuess=guess)
 # 	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
 # rp.plotOutput()
-#################### End Fit six Lorentzians ####################
-
+# ################### End Fit six Lorentzians ####################
 
 
 # Read in Data:
 dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
+
 xData, yData, time = dat[0], dat[1], dat[2]
 xData = convertToVelocity(xData, [-11,11])
-xData, yData = fd.cutData(xData, yData, interval=[3,7])
 
 # Plot Data:
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
@@ -153,13 +157,41 @@ cuts = [
 	[5.4,6.1],
 	[6.1,6.7]]
 
+cuts = [[6.2, 6.8],
+		[5.6, 6.0],
+		[5.1, 5.3],
+		[4.6, 4.8],
+		[4.0, 4.25],
+		[3.2, 3.6],
+		[-7.5, -7.1],
+		[-6.85, -6.7],
+		[-6.3, -6.1],
+		[-5.8, -5.6],
+		[-5.2, -5.0],
+		[-4.6, -4.4]]
+guesses = [[6.5, 70, 100],
+		[5.8, 71, 100],
+		[5.19, 88, 100],
+		[4.7, 85, 100],
+		[4.1, 55, 100],
+		[3.45, 60, 100],
+		[-7.4, 75, 100],
+		[-6.75, 75, 100],
+		[-6.2, 80, 100],
+		[-5.7, 80, 100],
+		[-5.1, 70, 100],
+		[-4.5, 65, 100]]
 
+
+rp.plotOutput()
+
+# Plot Fits:
 for i in rel(cuts):
-	peakPos = 0.5*(cuts[i][0]+cuts[i][1])
-	peakXs, peakYs = fd.cutData(xData,yData,interval=cuts[i])
-	peakHeight = max(peakYs)
-	peakDepth = peakHeight - min(peakYs)
 	fits = fitOneLorentzian(xData, yData, cut=cuts[i])
 	fitX, fitY = fits[0], fits[1]
-	rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzian "+str(i), colour="Green", lines=True)
+	if i == 0:
+		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit data", colour="Green", lines=True)
+	else:
+		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Green", lines=True)
+
 rp.plotOutput()

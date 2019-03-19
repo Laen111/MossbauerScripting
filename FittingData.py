@@ -34,7 +34,7 @@ def cutData(Xs, Ys, interval=[0,None], cutOn="x"):
 # the function that scipy will use to fit to
 # x0 is position of minimum, d is depth of minimum, a is vertical offset
 def func(x,x0,d,a):
-	numerator = -1/np.pi * (np.pi*d)**(1/3)
+	numerator = -1/(np.pi * (np.pi*d)**(1/3))
 	denominator = (x-x0)**2 + (np.pi*d)**(-2/3)
 	return numerator/denominator + a
 
@@ -43,7 +43,7 @@ def func(x,x0,d,a):
 # eYs is the error on Y measurements (a single value, or array of different errors)
 # initGuess is the inital guess for the algorithm, tweak if getting errors (array entry for each param in func)
 # guessBounds gives limits for the algorithm eg, guessBounds=(0,[4,7]) says param1 can search 0to4 and param2 can search 0to7
-def fitting(dXs, dYs, eYs=None, initGuess=None, guessBounds=None):
+def fitting(dXs, dYs, eYs=None, initGuess=None):
 	popt, pcov = curve_fit(func, dXs, dYs, p0=initGuess, sigma=eYs)
 	return popt, pcov
 
