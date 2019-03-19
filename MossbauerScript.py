@@ -17,8 +17,8 @@ import matplotlib.pyplot as plt
 h = 6.62607015*10**(-34) #Js
 e = 1.602176634*10**(-19) #C
 
-dataFolder = "C:/Users/Jake/Desktop/Mossbauer Lab Stuff/Data/"
-plotsFolder = "C:/Users/Jake/Desktop/Mossbauer Lab Stuff/Plots/"
+dataFolder = "./Data/"
+plotsFolder = "./Plots/"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Functions
@@ -51,10 +51,12 @@ def genPeaks(params1, params2, params3):
 def readCSV(filename):
 	rawdata = rp.readColumnFile(filename)
 	data = rawdata[0]
-	totalCount = data[0]
+	time = data[0]
 	xBins = [i for i in range(len(data)-1)]
 	yCounts = [data[i] for i in range(1,len(data))]
-	return [xBins, yCounts, totalCount]
+	#return [xBins, yCounts, time] # Return in bin space 
+	xVel = np.linspace(-11,11,2047)
+	return [xVel, yCounts, time]  # Return in vel space
 
 
 def fitOneLorentzian(xData, yData, cut=[0,1], guess=[1,5,10]):
@@ -128,25 +130,43 @@ def fitOneLorentzian(xData, yData, cut=[0,1], guess=[1,5,10]):
 dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
 xData, yData, totalCount = dat[0], dat[1], dat[2]
 
-# Fit Data:
-fits = fitOneLorentzian(xData, yData, cut=[1200,1600], guess=[1350,30,120])
-fitX, fitY = fits[0], fits[1]
 
 # Plot Data:
 rp.plotInit(xAx=r"Bins [unitless]", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
-rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit data", colour="Green", lines=True)
+
+# Plot Fits:
+cuts = [[6.2, 6.8], 
+		[5.6, 6.0], 
+		[5.1, 5.3], 
+		[4.6, 4.8], 
+		[4.0, 4.25], 
+		[3.2, 3.6],
+		[-7.5, -7.1], 
+		[-6.85, -6.7], 
+		[-6.3, -6.1], 
+		[-5.8, -5.6], 
+		[-5.2, -5.0], 
+		[-4.6, -4.4]]
+guesses = [[6.5, 70, 100], 
+		[5.8, 71, 100], 
+		[5.19, 88, 100], 
+		[4.7, 85, 100], 
+		[4.1, 55, 100], 
+		[3.45, 60, 100],
+		[-7.4, 75, 100], 
+		[-6.75, 75, 100], 
+		[-6.2, 80, 100], 
+		[-5.7, 80, 100], 
+		[-5.1, 70, 100], 
+		[-4.5, 65, 100]]
+
+for i in rel(cuts):
+	fits = fitOneLorentzian(xData, yData, cut=cuts[i], guess=guesses[i])
+	fitX, fitY = fits[0], fits[1]
+	if i == 0:
+		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit data", colour="Green", lines=True)
+	else:
+		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Green", lines=True)
+
 rp.plotOutput()
-
-
-cuts = [[6.2, 6.8], [5.6, 6.0], [5.1, 5.3], [4.6, 4.8], [4.0, 4.25], [3.2, 3.6]]
-guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.19, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.45, 60, 100]]
-
-
-cuts2 = [[-7.5, -7.1], [-6.85, -6.7], [-6.3, -6.1], [-5.8, -5.6], [-5.2, -5.0], [-4.6, -4.4]]
-guesses2 = [[-7.4, 75, 100], [-6.75, 75, 100], [-6.2, 80, 100], [-5.7, 80, 100], [-5.1, 70, 100], [-4.5, 65, 100]]
-
-
-
-
-
