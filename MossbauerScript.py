@@ -8,6 +8,7 @@ import FittingData as fd
 import ReadAndPlot as rp
 from uncertainties import ufloat
 from uncertainties import unumpy
+import matplotlib.pyplot as plt
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Constants
@@ -16,8 +17,8 @@ from uncertainties import unumpy
 h = 6.62607015*10**(-34) #Js
 e = 1.602176634*10**(-19) #C
 
-dataFolder = "./Data/"
-plotsFolder = "./Plots/"
+dataFolder = "C:/Users/Jake/Desktop/Mossbauer Lab Stuff/Data/"
+plotsFolder = "C:/Users/Jake/Desktop/Mossbauer Lab Stuff/Plots/"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Functions
@@ -52,7 +53,7 @@ def rel(listy):
 
 #################### This is the code to create the test data files ##########################
 # test data of six (three mirrored) peaks written to file and plotted from file
-testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1,100])
+testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1.7,100])
 f = open(dataFolder+"testsixpeaks.dat","w+")
 for i in range(len(testX)):
 	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
