@@ -72,6 +72,7 @@ def fitOneLorentzian(xData, yData, cut=[0,1], guess=None):
 		peakHeight = avg(cutY)
 		peakDepth = peakHeight - min(cutY)
 		guess = [peakPos,peakDepth,peakHeight]
+	print(guess)
 	popt, pcov = fd.fitting(xData, yData, eYs=None, initGuess=guess)
 	fitY = fd.fitYs(cutX, popt)
 	return [cutX, fitY]
@@ -153,43 +154,45 @@ rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitl
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
 
 # Fit Data:
-cuts = [
-	[3.4,3.7],
-	[3.7,4.4],
-	[4.4,4.9],
-	#[5.0,5.3],
-	[5.4,6.1],
-	[6.1,6.7]]
+# cuts = [
+# 	[3.4,3.7],
+# 	[3.7,4.4],
+# 	[4.4,4.9],
+# 	#[5.0,5.3],
+# 	[5.4,6.1],
+# 	[6.1,6.7]]
 
-cuts = [[6.2, 6.8],
-		[5.6, 6.0],
-		[5.1, 5.3],
-		[4.6, 4.8],
-		[4.0, 4.25],
-		[3.2, 3.6],
-		[-7.5, -7.1],
-		[-6.85, -6.7],
+# organized the cuts and guesses into order
+cuts = [[-7.6, -7.1],
+		#[-6.85, -6.7],
 		[-6.3, -6.1],
 		[-5.8, -5.6],
-		[-5.2, -5.0],
-		[-4.6, -4.4]]
-guesses = [[6.5, 70, 100],
-		[5.8, 71, 100],
-		[5.19, 88, 100],
-		[4.7, 85, 100],
-		[4.1, 55, 100],
-		[3.45, 60, 100],
-		[-7.4, 75, 100],
-		[-6.75, 75, 100],
-		[-6.2, 80, 100],
-		[-5.7, 80, 100],
-		[-5.1, 70, 100],
-		[-4.5, 65, 100]]
+		#[-5.2, -5.0],
+		#[-4.6, -4.4],
+		[3.3, 3.7],
+		#[4.0, 4.25],
+		[4.6, 4.8],
+		[5.1, 5.3],
+		[5.6, 6.0],
+		[6.2, 6.8]]
 
+guesses = [[-7.4, 60, 120],
+		#[-6.75, 75, 100],
+		[-6.2, 80, 100],
+		[-5.7, 90, 120],
+		#[-5.1, 70, 100],
+		#[-4.5, 65, 100],
+		[3.45, 60, 100],
+		#[4.1, 55, 100],
+		[4.7, 85, 100],
+		[5.19, 88, 100],
+		[5.8, 71, 100],
+		[6.5, 70, 100]]
+		
 
 # Plot Fits:
 for i in rel(cuts):
-	fits = fitOneLorentzian(xData, yData, cut=cuts[i])#, guess=guesses[i])
+	fits = fitOneLorentzian(xData, yData, cut=cuts[i], guess=guesses[i])
 	fitX, fitY = fits[0], fits[1]
 	if i == 0:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Green", lines=True)
