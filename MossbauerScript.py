@@ -62,13 +62,17 @@ def readCSV(filename):
 	yCounts = [data[i] for i in range(1,len(data))]
 	return [xBins, yCounts, time]
 
-
-def fitOneLorentzian(xData, yData, cut=[0,1]):
+# fits a single lorentzian based on the x cut data you provide
+# able to auto guess 'ideal' parameters based on the cut data
+# can override the auto guess by providing your own eg [1,5,10]
+def fitOneLorentzian(xData, yData, cut=[0,1], guess=None):
 	cutX,cutY = fd.cutData(xData,yData,interval=cut)
-	peakPos = cutX[cutY.index(min(cutY))]#0.5*(cut[0]+cut[1])
-	peakHeight = avg(cutY)
-	peakDepth = peakHeight - min(cutY)
-	popt, pcov = fd.fitting(xData, yData, eYs=None, initGuess=[peakPos,peakDepth,peakHeight])
+	if guess==None:
+		peakPos = cutX[cutY.index(min(cutY))]
+		peakHeight = avg(cutY)
+		peakDepth = peakHeight - min(cutY)
+		guess = [peakPos,peakDepth,peakHeight]
+	popt, pcov = fd.fitting(xData, yData, eYs=None, initGuess=guess)
 	fitY = fd.fitYs(cutX, popt)
 	return [cutX, fitY, popt, pcov]
 
@@ -189,7 +193,7 @@ guesses = [[6.5, 70, 100],
 for i in rel(cuts):
 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, cut=cuts[i])
 	if i == 0:
-		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit data", colour="Green", lines=True)
+		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Green", lines=True)
 	else:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Green", lines=True)
 
