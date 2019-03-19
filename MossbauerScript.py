@@ -98,6 +98,26 @@ for i in rel(cuts):
 	fitys = fd.fitYs(x, y, initGuess=guess)
 	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
 
+#rp.plotOutput() # Plot fake data (w error) along with the independant fits
 
+
+# Plotting the borrowed data and attempting to fit it
+rp.plotInit(xAx=r"Channel [unitless]", yAx=r"Counts [unitless]",plotTitle=r"Borrowed Data")
+
+dYs = rp.readColumnFile("Data/Fe2O3_05-02-2019_new.csv", header=1)[0]
+dXs = np.linspace(-11,11,2047)
+dXs = [i+0.5 for i in dXs]
+rp.plotData(dXs, dYs, eXs=0, eYs=0, dataLabel=r"Raw Data", colour="Blue", lines=False)
+
+# All six peaks
+cuts = [[-8.5,-5.5],[-5.5,-4],[-4,-0.5],[-0.5,2.5],[2.5,5],[5,8]]
+guesses = [[-7,45,120],[-4.8,50,120],[-1.75,25,120],[1.75,25,120],[4.8,50,120],[6.1,45,120]]
+
+for i in rel(cuts):
+	x,y = fd.cutData(dXs,dYs,interval = cuts[i])
+	guess = guesses[i]
+	fitys = fd.fitYs(x, y, initGuess=guess)
+	#rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
 
 rp.plotOutput()
+
