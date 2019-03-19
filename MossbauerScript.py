@@ -23,6 +23,15 @@ plotsFolder = "./Plots/"
 # Functions
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+def rel(listy):
+	return range(len(listy))
+
+def avg(array):
+	tally = 0
+	for elem in array:
+		tally += elem
+	return tally/len(array)
+
 #Takes 3 lists of Lorentzian parameters for each peak, mirrors the peaks
 #3 sets of [x0, d, a] where x0 is position of minimum, d is depth of minimum, a is vertical offset
 #Vertical offset should be same for each peak (or else it takes the average)
@@ -36,7 +45,7 @@ def genPeaks(params1, params2, params3):
 	y2 = fd.testData(x1, nparams2, errY = 0.05)
 	y3 = fd.testData(x1, nparams3, errY = 0.05)
 	yALL = []
-	for i in range(len(x1)):
+	for i in rel(x1):
 		yALL.append(y1[i] + y2[i] + y3[i] + y1[::-1][i] + y2[::-1][i] + y3[::-1][i] + (params1[2] + params2[2] + params3[2])/3)
 
 	return x1, yALL
@@ -45,14 +54,26 @@ def genPeaks(params1, params2, params3):
 # the header is the total number of counts
 # returns bin number, count number (in that bin), and total counts
 def readCSV(filename):
-	data = rp.readColumnFile(filename)
-	totalCount = data[0]
-	xBins = [i for i in (len(data)-1)]
+	rawdata = rp.readColumnFile(filename)
+	data = rawdata[0]
+	time = data[0]
+	xBins = [i for i in range(len(data)-1)]
 	yCounts = [data[i] for i in range(1,len(data))]
-	return [xBins, yCounts, totalCount]
+	return [xBins, yCounts, time]
 
-def rel(listy):
-	return range(len(listy))
+
+def fitOneLorentzian(xData, yData, cut=[0,1]):
+	cutX,cutY = fd.cutData(xData,yData,interval=cut)
+	peakPos = cutX[cutY.index(min(cutY))]#0.5*(cut[0]+cut[1])
+	peakHeight = avg(cutY)
+	peakDepth = peakHeight - min(cutY)
+	popt, pcov = fd.fitting(xData, yData, eYs=None, initGuess=[peakPos,peakDepth,peakHeight])
+	fitY = fd.fitYs(cutX, popt)
+	return [cutX, fitY]
+
+def convertToVelocity(xBins, lims=[-11,11]):
+	newXPoints = np.linspace(lims[0],lims[1],num=len(xBins))
+	return newXPoints
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -62,11 +83,11 @@ def rel(listy):
 
 #################### This is the code to create the test data files ##########################
 # test data of six (three mirrored) peaks written to file and plotted from file
-testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1,100])
-f = open(dataFolder+"testsixpeaks.dat","w+")
-for i in range(len(testX)):
-	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
-f.close()
+# testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1,100])
+# f = open(dataFolder+"testsixpeaks.dat","w+")
+# for i in rel(testX):
+# 	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
+# f.close()
 
 # sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
 # Xs, Ys = sixdat[0], sixdat[1]
@@ -80,7 +101,7 @@ f.close()
 # yData = fd.testData(xData, [5,3,10], errY=0.005, seed=30054)
 
 # f = open(dataFolder+"testdata.dat","w+")
-# for i in range(len(xData)):
+# for i in rel(xData):
 # 	f.write(str(xData[i])+"	"+str(yData[i])+"\n")
 # f.close()
 
@@ -91,30 +112,54 @@ f.close()
 # rp.plotOutput(plotsFolder+"testplot.png")
 #################### End of code to create the test data files ###############################
 
-# Read and plot the test data with 6 Lorentzians
-sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
-Xs, Ys = sixdat[0], sixdat[1]
-rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"test six Lorentzians")
-rp.plotData(Xs, Ys, 0, 0, dataLabel=r"Data", colour="Blue")
+#################### Fit six Lorentzians ####################
+# # Read and plot the test data with 6 Lorentzians
+# sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
+# Xs, Ys = sixdat[0], sixdat[1]
+# rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"test six Lorentzians")
+# rp.plotData(Xs, Ys, 0, 0, dataLabel=r"Data", colour="Blue")
 
-# Let's try fitting this data
-# peaks are in [-10,-6.5],[-6.5,-3],[-3,0],[0,3],[3,6.5],[6.5,10]
+# # Let's try fitting this data
+# # peaks are in [-10,-6.5],[-6.5,-3],[-3,0],[0,3],[3,6.5],[6.5,10]
 
-cuts = [[-10,-6.5],[-6.5,-3],[-3,0],[0,3],[3,6.5],[6.5,10]]
-guesses = [[-7.6,5,100],[-5,3,100],[-2,1,100],[2,1,100],[5,3,100],[7.6,5,100]]
+# cuts = [[-10,-6.5],[-6.5,-3],[-3,0],[0,3],[3,6.5],[6.5,10]]
+# guesses = [[-7.6,5,100],[-5,3,100],[-2,1,100],[2,1,100],[5,3,100],[7.6,5,100]]
+# for i in rel(cuts):
+# 	x,y = fd.cutData(Xs,Ys,interval = cuts[i])
+# 	guess = guesses[i]
+# 	fitys = fd.fitYs(x, y, initGuess=guess)
+# 	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
+# rp.plotOutput()
+#################### End Fit six Lorentzians ####################
+
+
+
+# Read in Data:
+dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
+xData, yData, time = dat[0], dat[1], dat[2]
+xData = convertToVelocity(xData, [-11,11])
+xData, yData = fd.cutData(xData, yData, interval=[3,7])
+
+# Plot Data:
+rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
+
+# Fit Data:
+cuts = [
+	[3.4,3.7],
+	[3.7,4.4],
+	[4.4,4.9],
+	#[5.0,5.3],
+	[5.4,6.1],
+	[6.1,6.7]]
+
+
 for i in rel(cuts):
-	x,y = fd.cutData(Xs,Ys,interval = cuts[i])
-	guess = guesses[i]
-	fitys = fd.fitYs(x, y, initGuess=guess)
-	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
-
+	peakPos = 0.5*(cuts[i][0]+cuts[i][1])
+	peakXs, peakYs = fd.cutData(xData,yData,interval=cuts[i])
+	peakHeight = max(peakYs)
+	peakDepth = peakHeight - min(peakYs)
+	fits = fitOneLorentzian(xData, yData, cut=cuts[i])
+	fitX, fitY = fits[0], fits[1]
+	rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzian "+str(i), colour="Green", lines=True)
 rp.plotOutput()
-
-
-# dat = rp.readColumnFile(dataFolder+"testdata.dat")
-# Xs, Ys = dat[0], dat[1]
-# rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"plotting test data")
-# rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
-# rp.plotOutput(plotsFolder+"testplot.png")
-
-
