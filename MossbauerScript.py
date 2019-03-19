@@ -60,19 +60,20 @@ def readCSV(filename):
 	time = data[0]
 	xBins = [i for i in range(len(data)-1)]
 	yCounts = [data[i] for i in range(1,len(data))]
-	return [xBins, yCounts, time]
+	yErr = [m.sqrt(i) for i in yCounts]
+	return [xBins, yCounts, yErr, time]
 
 # fits a single lorentzian based on the x cut data you provide
 # able to auto guess 'ideal' parameters based on the cut data
 # can override the auto guess by providing your own eg [1,5,10]
-def fitOneLorentzian(xData, yData, cut=[0,1], guess=None):
+def fitOneLorentzian(xData, yData, yErr=None, cut=[0,1], guess=None):
 	cutX,cutY = fd.cutData(xData,yData,interval=cut)
 	if guess==None:
 		peakPos = cutX[cutY.index(min(cutY))]
 		peakHeight = avg(cutY)
 		peakDepth = peakHeight - min(cutY)
 		guess = [peakPos,peakDepth,peakHeight]
-	popt, pcov = fd.fitting(xData, yData, eYs=None, initGuess=guess)
+	popt, pcov = fd.fitting(xData, yData, eYs=yErr, initGuess=guess)
 	fitY = fd.fitYs(cutX, popt)
 	return [cutX, fitY, popt, pcov]
 
@@ -145,12 +146,12 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # Read in Data:
 dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
 
-xData, yData, time = dat[0], dat[1], dat[2]
+xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
 xData = convertToVelocity(xData, [-11,11])
 
 # Plot Data:
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
-rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
+rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
 
 # Fit Data:
 cuts = [
@@ -173,6 +174,7 @@ cuts = [[6.2, 6.8],
 		[-5.8, -5.6],
 		[-5.2, -5.0],
 		[-4.6, -4.4]]
+
 guesses = [[6.5, 70, 100],
 		[5.8, 71, 100],
 		[5.19, 88, 100],
@@ -191,7 +193,7 @@ guesses = [[6.5, 70, 100],
 
 # Plot Fits:
 for i in rel(cuts):
-	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, cut=cuts[i])
+	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
 	if i == 0:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Green", lines=True)
 	else:
