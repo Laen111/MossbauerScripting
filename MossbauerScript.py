@@ -70,8 +70,8 @@ def fitOneLorentzian(xData, yData, cut=[0,1], guess=[1,5,10]):
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-#################### This is the code to create the test data files ##########################
-# test data of six (three mirrored) peaks written to file and plotted from file
+# ################### This is the code to create the test data files ##########################
+# #test data of six (three mirrored) peaks written to file and plotted from file
 
 # testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1.7,100])
 # f = open(dataFolder+"testsixpeaks.dat","w+")
@@ -102,10 +102,10 @@ def fitOneLorentzian(xData, yData, cut=[0,1], guess=[1,5,10]):
 # rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"plotting test data")
 # rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
 # rp.plotOutput(plotsFolder+"testplot.png")
-#################### End of code to create the test data files ###############################
+# ################### End of code to create the test data files ###############################
 
 
-#################### Fit six Lorentzians ####################
+# #################### Fit six Lorentzians ####################
 # # Read and plot the test data with 6 Lorentzians
 # sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
 # Xs, Ys = sixdat[0], sixdat[1]
@@ -123,7 +123,7 @@ def fitOneLorentzian(xData, yData, cut=[0,1], guess=[1,5,10]):
 # 	fitys = fd.fitYs(x, y, initGuess=guess)
 # 	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
 # rp.plotOutput()
-#################### End Fit six Lorentzians ####################
+# ################### End Fit six Lorentzians ####################
 
 
 # Read in Data:
@@ -134,6 +134,7 @@ xData, yData, totalCount = dat[0], dat[1], dat[2]
 # Plot Data:
 rp.plotInit(xAx=r"Bins [unitless]", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
+rp.plotOutput()
 
 # Plot Fits:
 cuts = [[6.2, 6.8],

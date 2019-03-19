@@ -34,7 +34,7 @@ def cutData(Xs, Ys, interval=[0,None], cutOn="x"):
 # the function that scipy will use to fit to
 # x0 is position of minimum, d is depth of minimum, a is vertical offset
 def func(x,x0,d,a):
-	numerator = -1/np.pi * (np.pi*d)**(1/3)
+	numerator = -1/(np.pi * (np.pi*d)**(1/3))
 	denominator = (x-x0)**2 + (np.pi*d)**(-2/3)
 	return numerator/denominator + a
 
