@@ -43,13 +43,13 @@ def func(x,x0,d,a):
 # eYs is the error on Y measurements (a single value, or array of different errors)
 # initGuess is the inital guess for the algorithm, tweak if getting errors (array entry for each param in func)
 # guessBounds gives limits for the algorithm eg, guessBounds=(0,[4,7]) says param1 can search 0to4 and param2 can search 0to7
-def fitting(dXs, dYs, eYs=None, initGuess=None, guessBounds=None):
+def fitting(dXs, dYs, eYs=None, initGuess=None):
 	popt, pcov = curve_fit(func, dXs, dYs, p0=initGuess, sigma=eYs)
 	return popt, pcov
 
 # basically the above function but it returns only the y values from the fit
 def fitYs(dXs, dYs, initGuess=None):
-	popt,pcov = fitting(dXs, dYs, eYs=None, initGuess=initGuess, guessBounds=None)
+	popt,pcov = fitting(dXs, dYs, eYs=None, initGuess=initGuess)
 	fitYs = func(dXs,popt[0],popt[1],popt[2])
 	return fitYs
 
