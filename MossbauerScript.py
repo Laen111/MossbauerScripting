@@ -42,39 +42,73 @@ def genPeaks(params1, params2, params3):
 
 	return x1, yALL
 
+def rel(listy):
+	return range(len(listy))
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Scripting
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 # test data of six (three mirrored) peaks written to file and plotted from file
-testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1.7,100])
-f = open(dataFolder+"testsixpeaks.dat","w+")
-for i in range(len(testX)):
-	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
-f.close()
+# testX, testY = genPeaks([-8,5,100], [-5,3,100], [-1.5,1.7,100])
+# f = open(dataFolder+"testsixpeaks.dat","w+")
+# for i in range(len(testX)):
+# 	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
+# f.close()
 
-sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
-Xs, Ys = sixdat[0], sixdat[1]
-rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"test six lorentzians")
-rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
-rp.plotOutput(plotsFolder+"testsixpeaks.png")
+# sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
+# Xs, Ys = sixdat[0], sixdat[1]
+# rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"test six lorentzians")
+# rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
+# rp.plotOutput(plotsFolder+"testsixpeaks.png")
 
 
-# quick simple lorentzian line shape test data written to file and plotted from file
-xData = [i*0.1 for i in range(0,100)]
-yData = fd.testData(xData, [5,3,10], errY=0.005, seed=30054)
+# # quick simple lorentzian line shape test data written to file and plotted from file
+# xData = [i*0.1 for i in range(0,100)]
+# yData = fd.testData(xData, [5,3,10], errY=0.005, seed=30054)
 
-f = open(dataFolder+"testdata.dat","w+")
-for i in range(len(xData)):
-	f.write(str(xData[i])+"	"+str(yData[i])+"\n")
-f.close()
+# f = open(dataFolder+"testdata.dat","w+")
+# for i in range(len(xData)):
+# 	f.write(str(xData[i])+"	"+str(yData[i])+"\n")
+# f.close()
 
-dat = rp.readColumnFile(dataFolder+"testdata.dat")
-Xs, Ys = dat[0], dat[1]
-rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"plotting test data")
-rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
-rp.plotOutput(plotsFolder+"testplot.png")
+# dat = rp.readColumnFile(dataFolder+"testdata.dat")
+# Xs, Ys = dat[0], dat[1]
+# rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"plotting test data")
+# rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
+# rp.plotOutput(plotsFolder+"testplot.png")
 
+
+# f = open(dataFolder+"Fe2O3_05-02-2019_new.csv","w+")
+# for i in range(len(xData)):
+# 	f.write(str(xData[i])+"	"+str(yData[i])+"\n")
+# f.close()
+
+data = rp.readColumnFile(dataFolder+"Fe2O3_05-02-2019_new.csv")
+Xs = np.linspace(-11,11, len(data[0][1:]))
+Ys = data[0][1:]
+
+rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"Borrowed Data")
+rp.plotData(Xs,Ys, 0, 0, dataLabel=r"default", colour="Blue")
+
+
+cuts = [[6.2, 6.8], [5.6, 6.0], [5.1, 5.3], [4.6, 4.8], [4.0, 4.25], [3.2, 3.6]]
+guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.19, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.45, 60, 100]]
+for i in rel(cuts):
+	x,y = fd.cutData(Xs,Ys,interval = cuts[i])
+	guess = guesses[i]
+	fitys = fd.fitYs(x, y, initGuess=guess)
+	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
+
+
+cuts2 = [[-7.5, -7.3], [-6.85, -6.7], [-6.3, -6.1], [-5.8, -5.6], [-5.2, -5.0], [-4.6, -4.4]]
+guesses2 = [[-7.4, 75, 100], [-6.75, 75, 100], [-6.2, 80, 100], [-5.7, 80, 100], [-5.1, 70, 100], [-4.5, 65, 100]]
+for i in rel(cuts2):
+	x,y = fd.cutData(Xs,Ys,interval = cuts2[i])
+	guess2 = guesses2[i]
+	fitys = fd.fitYs(x, y, initGuess=guess2)
+	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
+
+rp.plotOutput()
 
 #test change to neal branch
