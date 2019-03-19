@@ -109,18 +109,23 @@ rp.plotData(dXs, dYs, eXs=0, eYs=0, dataLabel=r"Raw Data", colour="Blue", lines=
 cuts = [[6.2, 6.8], [5.6, 6.0], [5.1, 5.3], [4.6, 4.8], [4.0, 4.25], [3.2, 3.6]]
 guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.19, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.45, 60, 100]]
 for i in rel(cuts):
-	x,y = fd.cutData(Xs,Ys,interval = cuts[i])
+	x,y = fd.cutData(dXs,dYs,interval = cuts[i])
 	guess = guesses[i]
-	fitys = fd.fitYs(x, y, initGuess=guess)
-	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
+	popt,pcov = fd.fitting(x, y, eYs=None, initGuess=guess)
+	fitYs = fd.func(x,popt[0],popt[1],popt[2])
+	if i == 0:
+		rp.plotData(x, fitYs, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
+	else:
+		rp.plotData(x, fitYs, 0, 0, dataLabel=None, colour="Orange",lines = 'True')
 
-cuts2 = [[-7.5, -7.3], [-6.85, -6.7], [-6.3, -6.1], [-5.8, -5.6], [-5.2, -5.0], [-4.6, -4.4]]
-guesses2 = [[-7.4, 75, 100], [-6.75, 75, 100], [-6.2, 80, 100], [-5.7, 80, 100], [-5.1, 70, 100], [-4.5, 65, 100]]
-for i in rel(cuts2):
-	x,y = fd.cutData(Xs,Ys,interval = cuts2[i])
-	guess2 = guesses2[i]
-	fitys = fd.fitYs(x, y, initGuess=guess2)
-	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
+# cuts2 = [[-7.5, -7.1], [-6.85, -6.7], [-6.3, -6.1], [-5.8, -5.6], [-5.2, -5.0], [-4.6, -4.4]]
+# guesses2 = [[-7.4, 75, 100], [-6.75, 75, 100], [-6.2, 80, 100], [-5.7, 80, 100], [-5.1, 70, 100], [-4.5, 65, 100]]
+# for i in rel(cuts2):
+# 	x,y = fd.cutData(dXs,dYs,interval = cuts2[i])
+# 	guess2 = guesses2[i]
+# 	popt,pcov = fd.fitting(x, y, eYs=None, initGuess=guess)
+# 	fitYs = fd.func(x,popt[0],popt[1],popt[2])
+# 	rp.plotData(x, fitYs, 0, 0, dataLabel=None, colour="Orange",lines = 'True')
 
 rp.plotOutput()
 
