@@ -26,6 +26,12 @@ plotsFolder = "./Plots/"
 def rel(listy):
 	return range(len(listy))
 
+def avg(array):
+	tally = 0
+	for elem in array:
+		tally += elem
+	return tally/len(array)
+
 #Takes 3 lists of Lorentzian parameters for each peak, mirrors the peaks
 #3 sets of [x0, d, a] where x0 is position of minimum, d is depth of minimum, a is vertical offset
 #Vertical offset should be same for each peak (or else it takes the average)
@@ -50,16 +56,24 @@ def genPeaks(params1, params2, params3):
 def readCSV(filename):
 	rawdata = rp.readColumnFile(filename)
 	data = rawdata[0]
-	totalCount = data[0]
+	time = data[0]
 	xBins = [i for i in range(len(data)-1)]
 	yCounts = [data[i] for i in range(1,len(data))]
-	return [xBins, yCounts, totalCount]
+	return [xBins, yCounts, time]
 
 
-def fitOneLorentzian(xData, yData, cut=[0,1], guess=[1,5,10]):
+def fitOneLorentzian(xData, yData, cut=[0,1]):
 	cutX,cutY = fd.cutData(xData,yData,interval=cut)
-	fitY = fd.fitYs(cutX, cutY, initGuess=guess)
+	peakPos = cutX[cutY.index(min(cutY))]#0.5*(cut[0]+cut[1])
+	peakHeight = avg(cutY)
+	peakDepth = peakHeight - min(cutY)
+	popt, pcov = fd.fitting(xData, yData, eYs=None, initGuess=[peakPos,peakDepth,peakHeight])
+	fitY = fd.fitYs(cutX, popt)
 	return [cutX, fitY]
+
+def convertToVelocity(xBins, lims=[-11,11]):
+	newXPoints = np.linspace(lims[0],lims[1],num=len(xBins))
+	return newXPoints
 
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -122,14 +136,30 @@ def fitOneLorentzian(xData, yData, cut=[0,1], guess=[1,5,10]):
 
 # Read in Data:
 dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
-xData, yData, totalCount = dat[0], dat[1], dat[2]
-
-# Fit Data:
-fits = fitOneLorentzian(xData, yData, cut=[1200,1600], guess=[1350,30,120])
-fitX, fitY = fits[0], fits[1]
+xData, yData, time = dat[0], dat[1], dat[2]
+xData = convertToVelocity(xData, [-11,11])
+xData, yData = fd.cutData(xData, yData, interval=[3,7])
 
 # Plot Data:
-rp.plotInit(xAx=r"Bins [unitless]", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
-rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit data", colour="Green", lines=True)
+
+# Fit Data:
+cuts = [
+	[3.4,3.7],
+	[3.7,4.4],
+	[4.4,4.9],
+	#[5.0,5.3],
+	[5.4,6.1],
+	[6.1,6.7]]
+
+
+for i in rel(cuts):
+	peakPos = 0.5*(cuts[i][0]+cuts[i][1])
+	peakXs, peakYs = fd.cutData(xData,yData,interval=cuts[i])
+	peakHeight = max(peakYs)
+	peakDepth = peakHeight - min(peakYs)
+	fits = fitOneLorentzian(xData, yData, cut=cuts[i])
+	fitX, fitY = fits[0], fits[1]
+	rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzian "+str(i), colour="Green", lines=True)
 rp.plotOutput()
