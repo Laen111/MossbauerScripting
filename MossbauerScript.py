@@ -17,8 +17,8 @@ import matplotlib.pyplot as plt
 h = 6.62607015*10**(-34) #Js
 e = 1.602176634*10**(-19) #C
 
-dataFolder = "C:/Users/Jake/Desktop/Mossbauer Lab Stuff/Data/"
-plotsFolder = "C:/Users/Jake/Desktop/Mossbauer Lab Stuff/Plots/"
+dataFolder = "./Data/"
+plotsFolder = "./Plots/"
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Functions
