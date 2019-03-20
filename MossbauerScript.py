@@ -60,22 +60,22 @@ def readCSV(filename):
 	time = data[0]
 	xBins = [i for i in range(len(data)-1)]
 	yCounts = [data[i] for i in range(1,len(data))]
-	return [xBins, yCounts, time]
+	yErr = [m.sqrt(i) for i in yCounts]
+	return [xBins, yCounts, yErr, time]
 
 # fits a single lorentzian based on the x cut data you provide
 # able to auto guess 'ideal' parameters based on the cut data
 # can override the auto guess by providing your own eg [1,5,10]
-def fitOneLorentzian(xData, yData, cut=[0,1], guess=None):
+def fitOneLorentzian(xData, yData, yErr=None, cut=[0,1], guess=None):
 	cutX,cutY = fd.cutData(xData,yData,interval=cut)
 	if guess==None:
 		peakPos = cutX[cutY.index(min(cutY))]
 		peakHeight = avg(cutY)
 		peakDepth = peakHeight - min(cutY)
 		guess = [peakPos,peakDepth,peakHeight]
-	print(guess)
-	popt, pcov = fd.fitting(xData, yData, eYs=None, initGuess=guess)
+	popt, pcov = fd.fitting(xData, yData, eYs=yErr, initGuess=guess)
 	fitY = fd.fitYs(cutX, popt)
-	return [cutX, fitY]
+	return [cutX, fitY, popt, pcov]
 
 def convertToVelocity(xBins, lims=[-11,11]):
 	newXPoints = np.linspace(lims[0],lims[1],num=len(xBins))
@@ -146,12 +146,12 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # Read in Data:
 dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
 
-xData, yData, time = dat[0], dat[1], dat[2]
+xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
 xData = convertToVelocity(xData, [-11,11])
 
 # Plot Data:
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
-rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
+rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
 
 # Fit Data:
 # cuts = [
@@ -188,12 +188,17 @@ guesses = [[-7.4, 60, 120],
 		[5.19, 88, 100],
 		[5.8, 71, 100],
 		[6.5, 70, 100]]
-		
+
+
+#Good guesses (work for Jake)
+#cuts = [[6.2, 6.8], [5.6, 6.0], [5.10, 5.23], [4.63, 4.80], [3.95, 4.25], [3.4, 3.67]]
+#guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.17, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.51, 60, 100]]
+
+#rp.plotOutput()
 
 # Plot Fits:
 for i in rel(cuts):
-	fits = fitOneLorentzian(xData, yData, cut=cuts[i], guess=guesses[i])
-	fitX, fitY = fits[0], fits[1]
+	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
 	if i == 0:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Green", lines=True)
 	else:
