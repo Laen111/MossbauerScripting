@@ -265,14 +265,22 @@ for i in rel(cuts):
 
 
 # Make a .dat file with a LaTeX table of all the fit parameters 
-fitParams = open("fitParams.dat","w+")
+fitParams = open("fitParamsTable.dat","w+")
+
+fitParams.write("\\begin{table}[] \n")
+fitParams.write("\\centering \n")
+fitParams.write("\\begin{tabular}{|c|c|c|c|}\\hline \n")
+fitParams.write("Fit Number & $x_0$ [mm/s] & d [counts] & a [counts] \\\\ \\hline \n")
 
 for i in rel(cuts):
 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
-	params = ["x_0","d","a"]
-	fitParams.write("fit"+str(i)+":"+"\n")
-	for j in rel(popt):
-		fitParams.write(params[j]+" = "+str(popt[j])+" +/- "+str(m.sqrt(pcov[j][j]))+"\n")
-	fitParams.write("\n")
+	fitParams.write(str(i)+" & "+str('%.2f'%(popt[0]))+"$\\pm$"+str('%.3f'%(m.sqrt(pcov[0][0])))+
+							" & "+str('%.2f'%(popt[1]))+"$\\pm$"+str('%.2f'%(m.sqrt(pcov[1][1])))+
+							" & "+str('%.2f'%(popt[2]))+"$\\pm$"+str('%.2f'%(m.sqrt(pcov[2][2])))+ 
+							"\\\\ \\hline \n")
 
+fitParams.write("\\end{tabular} \n")
+fitParams.write("\\caption{Fit parameters for all 12 peaks.} \n")
+fitParams.write("\\label{table:my_label} \n")
+fitParams.write("\\end{table}")
 fitParams.close()
