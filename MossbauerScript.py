@@ -37,8 +37,8 @@ def avg(array):
 # x0 is position of minimum, d is depth of minimum, a is vertical offset
 # migrated the fitting function to this file to leave 'backend files' unmodifed (and more generic)
 def lorentzian(x,x0,d,a):
-	numerator = -1/(np.pi * (np.pi*d)**(1/3))
-	denominator = (x-x0)**2 + (np.pi*d)**(-2/3)
+	numerator = -1/(d*np.pi**2)
+	denominator = (x-x0)**2 + (np.pi*d)**(-2)
 	return numerator/denominator + a
 
 #Takes 3 lists of Lorentzian parameters for each peak, mirrors the peaks
@@ -50,9 +50,9 @@ def genPeaks(params1, params2, params3):
 	x1 = np.linspace(-10,10,5000)
 	#Sets vertical offset to 0 to add them all up, then later avg. vertical offset is added back
 	nparams1, nparams2, nparams3 = [params1[0], params1[1], 0], [params2[0], params2[1], 0], [params3[0], params3[1], 0]
-	y1 = fd.testData(x1, nparams1, errY = 0.05)
-	y2 = fd.testData(x1, nparams2, errY = 0.05)
-	y3 = fd.testData(x1, nparams3, errY = 0.05)
+	y1 = fd.testData(x1, nparams1, function=lorentzian, errY = 0.05)
+	y2 = fd.testData(x1, nparams2, function=lorentzian, errY = 0.05)
+	y3 = fd.testData(x1, nparams3, function=lorentzian, errY = 0.05)
 	yALL = []
 	for i in rel(x1):
 		yALL.append(y1[i] + y2[i] + y3[i] + y1[::-1][i] + y2[::-1][i] + y3[::-1][i] + (params1[2] + params2[2] + params3[2])/3)
@@ -116,7 +116,7 @@ def convertToVelocity(xBins, lims=[-11,11]):
 
 # # quick simple lorentzian line shape test data written to file and plotted from file
 # xData = [i*0.1 for i in range(0,100)]
-# yData = fd.testData(xData, [5,3,10], errY=0.005, seed=30054)
+# yData = fd.testData(xData, [5,3,10], function=lorentzian, errY=0.005, seed=30054)
 
 # f = open(dataFolder+"testdata.dat","w+")
 # for i in rel(xData):
@@ -146,7 +146,7 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # for i in rel(cuts):
 # 	x,y = fd.cutData(Xs,Ys,interval = cuts[i])
 # 	guess = guesses[i]
-# 	fitys = fd.fitYs(x, y, initGuess=guess)
+# 	fitys = fd.fitYs(x, y, function=lorentzian)
 # 	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
 # rp.plotOutput()
 # ################### End Fit six Lorentzians ####################
@@ -155,7 +155,7 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # organized the cuts and guesses into order, should be very accurate to true values
 cuts = [
 		[-7.5, -7.2],
-		[-6.8, -6.6],#[-7.0, -6.6],
+		[-7.0, -6.5],#[-7.0, -6.6],
 		[-6.3, -6.1],#[-6.4, -6.0],
 		[-5.9, -5.6],
 		[-5.3, -4.9],
