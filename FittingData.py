@@ -41,7 +41,7 @@ def func(x,m,b):
 # initGuess is the inital guess for the algorithm, tweak if getting errors (array entry for each param in func)
 # guessBounds gives limits for the algorithm eg, guessBounds=(0,[4,7]) says param1 can search 0to4 and param2 can search 0to7
 # made scipy make more attempts at fitting to reduce it giving up too fast
-def fitting(dXs, dYs, function=func, eYs=None, initGuess=None, bounds=(-np.inf,np.inf), attempts=1000000):
+def fitting(dXs, dYs, function=func, eYs=None, initGuess=None, bounds=(-np.inf,np.inf), attempts=800):
 	popt, pcov = curve_fit(function, dXs, dYs, p0=initGuess, sigma=eYs, bounds=bounds, maxfev=attempts)
 	return popt, pcov
 

@@ -84,7 +84,7 @@ def fitOneLorentzian(xData, yData, yErr=None, cut=[0,1], guess=None, bounds=(-np
 	popt, pcov = fd.fitting(xData, yData, lorentzian, eYs=yErr, initGuess=guess)
 	fitX = np.linspace(cut[0],cut[1],num=2000)
 	fitY = fd.fitYs(fitX, popt, lorentzian)
-	return [fitX, fitY, popt, pcov]
+	return [fitX, fitY, popt, pcov]	
 
 def convertToVelocity(xBins, lims=[-11,11]):
 	newXPoints = np.linspace(lims[0],lims[1],num=len(xBins))
@@ -199,16 +199,44 @@ rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle
 rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
 
 # Plot Fits:
-for i in rel(cuts):
-	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i], guess=guesses[i], bounds=([cuts[i][0],20,100],[cuts[i][1],100,130]))
-	print(guesses[i])
-	print(popt)
-	if i == 0:
-		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
-	else:
-		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
+xOffsets = []
+yOffsets = []
+depths = []
 
+for i in rel(cuts):
+	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i], guess=None, bounds=([cuts[i][0],20,100],[cuts[i][1],100,130]))
+	#print(guesses[i])
+	# if i == 0:
+	# 	rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+	# else:
+	# 	rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
+	#print(popt)
+	xOffsets.append(popt[0])
+	depths.append(popt[1])
+	yOffsets.append(popt[2])
+
+yOffset = np.average(yOffsets)
+y1 = lorentzian(xData,xOffsets[0],depths[0],0)
+y2 = lorentzian(xData,xOffsets[1],depths[1],0)
+y3 = lorentzian(xData,xOffsets[2],depths[2],0)
+y4 = lorentzian(xData,xOffsets[3],depths[3],0)
+y5 = lorentzian(xData,xOffsets[4],depths[4],0)
+y6 = lorentzian(xData,xOffsets[5],depths[5],0)
+y7 = lorentzian(xData,xOffsets[6],depths[6],0)
+y8 = lorentzian(xData,xOffsets[7],depths[7],0)
+y9 = lorentzian(xData,xOffsets[8],depths[8],0)
+y10 = lorentzian(xData,xOffsets[9],depths[9],0)
+y11 = lorentzian(xData,xOffsets[10],depths[10],0)
+y12 = lorentzian(xData,xOffsets[11],depths[11],0)
+
+finalYs = [sum(x) for x in zip(y1,y2,y3,y4,y5,y6,y7,y8,y9,y10,y11,y12)]
+
+finalYs = [finalYs[i] + yOffset for i in rel(finalYs)]
+
+rp.plotData(xData,finalYs,0,0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
 rp.plotOutput()
+
+
 
 
 # Plot Fits separately:
