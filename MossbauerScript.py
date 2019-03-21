@@ -37,7 +37,7 @@ def avg(array):
 # x0 is position of minimum, d is depth of minimum, a is vertical offset
 # migrated the fitting function to this file to leave 'backend files' unmodifed (and more generic)
 def lorentzian(x,x0,d,a):
-	numerator = -1/(np.pi**2)*d
+	numerator = -1/((np.pi**2)*d)
 	denominator = (x-x0)**2 + (np.pi*d)**(-2)
 	return numerator/denominator + a
 
@@ -189,24 +189,26 @@ guesses = [
 # guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.17, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.51, 60, 100]]
 
 
-# # Read in Data:
-# dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
-# xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
-# xData = convertToVelocity(xData, [-11,11])
+# Read in Data:
+dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
+xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
+xData = convertToVelocity(xData, [-11,11])
 
-# # Plot Data:
-# rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
-# rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
+# Plot Data:
+rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
 
-# # Plot Fits:
-# for i in rel(cuts):
-# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i], guess=guesses[i], bounds=([cuts[i][0],20,100],[cuts[i][1],100,130]))
-# 	if i == 0:
-# 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
-# 	else:
-# 		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
+# Plot Fits:
+for i in rel(cuts):
+	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i], guess=guesses[i], bounds=([cuts[i][0],20,100],[cuts[i][1],100,130]))
+	print(guesses[i])
+	print(popt)
+	if i == 0:
+		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+	else:
+		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
 
-# rp.plotOutput()
+rp.plotOutput()
 
 
 # Plot Fits separately:
