@@ -63,11 +63,11 @@ def plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"Default Titl
 # scatter to false will plot lines
 def plotData(dXs, dYs, eXs=0, eYs=0, dataLabel=r"default", colour="Blue", lines=False, rescaleX=1, rescaleY=1):
 	ax = plot.subplot(111)
+	plot.errorbar(dXs, dYs, xerr=eXs, yerr=eYs, ecolor=colour, fmt='none', elinewidth=0.2)
 	if lines:
-		plot.plot(dXs, dYs, label=dataLabel, color=colour, marker='', linestyle='-', linewidth=1.0)
+		plot.plot(dXs, dYs, label=dataLabel, color=colour, marker='', linestyle='-', linewidth=0.6)
 	else:
-		plot.plot(dXs, dYs, label=dataLabel, color=colour, marker='.', linestyle='', markersize=0.8)
-	plot.errorbar(dXs, dYs, xerr=eXs, yerr=eYs, ecolor=colour, fmt='none', elinewidth=0.4)
+		plot.plot(dXs, dYs, label=dataLabel, color=colour, marker='.', linestyle='', markersize=0.6)
 	ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
 # call once to show the plot

@@ -105,14 +105,11 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # 	f.write(str(testX[i])+"	"+str(testY[i])+"\n")
 # f.close()
 
-
-
 # sixdat = rp.readColumnFile(dataFolder+"testsixpeaks.dat")
 # Xs, Ys = sixdat[0], sixdat[1]
 # rp.plotInit(xAx=r"Xs [unitless]", yAx=r"Ys [unitless]",plotTitle=r"test six lorentzians")
 # rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
 # rp.plotOutput(plotsFolder+"testsixpeaks.png")
-
 
 # # quick simple lorentzian line shape test data written to file and plotted from file
 # xData = [i*0.1 for i in range(0,100)]
@@ -129,6 +126,7 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # rp.plotData(Xs, Ys, 0, 0, dataLabel=r"default", colour="Blue")
 # rp.plotOutput(plotsFolder+"testplot.png")
 # ################### End of code to create the test data files ###############################
+
 
 
 # #################### Fit six Lorentzians ####################
@@ -150,6 +148,7 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # 	rp.plotData(x, fitys, 0, 0, dataLabel=r"Fits", colour="Orange",lines = 'True')
 # rp.plotOutput()
 # ################### End Fit six Lorentzians ####################
+
 
 
 # organized the cuts and guesses into order, should be very accurate to true values
@@ -184,58 +183,10 @@ cuts = [
 # 		]
 
 
-#Good guesses (work for Jake)
-# cuts = [[6.2, 6.8], [5.6, 6.0], [5.10, 5.23], [4.63, 4.80], [3.95, 4.25], [3.4, 3.67]]
-# guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.17, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.51, 60, 100]]
-
-
 # Read in Data:
 dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
 xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
 xData = convertToVelocity(xData, [-11,11])
-
-# Plot Data:
-
-# # Plot Fits:
-# rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
-# rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
-# for i in rel(cuts):
-# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
-# 	if i == 0:
-# 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
-# 	else:
-# 		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
-# rp.plotOutput(plotsFolder+"FitData.png")
-
-
-# # Plot Fits separately:
-# totalX = np.linspace(min(xData), max(xData), num=22*1000)
-# for i in rel(cuts):
-# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
-# 	totalY = fd.fitYs(totalX, popt, lorentzian)
-
-# 	rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
-# 	rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
-# 	rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
-# 	rp.plotData([cuts[i][0],cuts[i][1]], [50,50], 0, 0, dataLabel="Fitting Range", colour="Green", lines=True)
-# 	rp.plotOutput(plotsFolder+"bounded_"+str(i)+"_fitLorenztian"+".png")
-
-
-# # Plot Fits only:
-# rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
-# totalY = np.linspace(0, 0, num=22*1000)
-# totalX = np.linspace(min(xData), max(xData), num=22*1000)
-# allHeights = []
-# print(totalY)
-# for i in rel(cuts):
-# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
-# 	fitY = fd.fitYs(totalX, popt, lorentzian)
-# 	totalY += (np.array(fitY)-popt[2])
-# 	allHeights.append(popt[2])
-
-# totalY = totalY+avg(allHeights)
-# rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
-# rp.plotOutput(plotsFolder+"allFitsOnlyFits.png")
 
 
 # plot raw data with error bars
@@ -243,14 +194,43 @@ rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitl
 rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
 rp.plotOutput(plotsFolder+"DataErrorBars.png")
 
-
 # fit things
 fittingOutput = []
 for i in rel(cuts):
 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
 	fittingOutput.append([cuts[i], fitX, fitY, popt, pcov])
 
+# print results to file
+f = open(dataFolder+"fittingresults.dat","w+")
+header = "Lower Cut\tUpper Cut\tx0\td\ta\tCovariance Matrix(formatted row1 row2 row3)\n"
+f.write(header)
+for i in rel(fittingOutput):
+	cut, fitX, fitY, popt, pcov = fittingOutput[i]
+	cov1, cov2, cov3 = pcov[0], pcov[1], pcov[2]
+	lineToWrite = str(cut[0]) + "\t" + str(cut[1]) + "\t" + str(popt[0]) + "\t" + str(popt[1]) + "\t" + str(popt[2]) + "\t" + str(cov1[0]) + "\t" + str(cov1[1]) + "\t" + str(cov1[2]) + "\t" + str(cov2[0]) + "\t" + str(cov2[1]) + "\t" + str(cov2[2]) + "\t" + str(cov3[0]) + "\t" + str(cov3[1]) + "\t" + str(cov3[2]) + "\n"
+	f.write(lineToWrite)
+f.close()
+
+
 # plot data and fits
+rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
+for i in rel(fittingOutput):
+	cut, fitX, fitY, popt, pcov = fittingOutput[i]
+	x0 = ufloat(popt[0], m.sqrt(pcov[0][0]))
+	d = ufloat(popt[1], m.sqrt(pcov[1][1]))
+	a = ufloat(popt[2], m.sqrt(pcov[2][2]))
+	fitYErrors = []
+	for x in fitX:
+		y = lorentzian(x,x0,d,a)
+		fitYErrors.append(y.s)
+	if i == 0:
+		rp.plotData(fitX, fitY, 0, fitYErrors, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+	else:
+		rp.plotData(fitX, fitY, 0, fitYErrors, dataLabel=None, colour="Red", lines=True)
+rp.plotOutput(plotsFolder+"FitDataErrors.png")
+
+# plot fits and their errors
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
 for i in rel(fittingOutput):
@@ -260,7 +240,6 @@ for i in rel(fittingOutput):
 	else:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
 rp.plotOutput(plotsFolder+"FitData.png")
-
 
 # plot the fits together
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
@@ -276,13 +255,17 @@ totalY = totalY+avg(allHeights)
 rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
 rp.plotOutput(plotsFolder+"allFitsOnlyFits.png")
 
-# print results to file
-f = open(dataFolder+"fittingresults.dat","w+")
-header = "Lower Cut\tUpper Cut\tx0\td\ta\tCovariant Matrix (formatted row1 row2 row3)\n"
-f.write(header)
+# plot along original data points (get residuals)
+rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+totalY = np.linspace(0, 0, num=len(xData))
+allHeights = []
 for i in rel(fittingOutput):
 	cut, fitX, fitY, popt, pcov = fittingOutput[i]
-	cov1, cov2, cov3 = pcov[0], pcov[1], pcov[2]
-	lineToWrite = str(cut[0]) + "\t" + str(cut[1]) + "\t" + str(popt[0]) + "\t" + str(popt[1]) + "\t" + str(popt[2]) + "\t" + str(cov1) + "\t" + str(cov2) + "\t" + str(cov3) + "\n"
-	f.write(lineToWrite)
-f.close()
+	fitY = fd.fitYs(xData, popt, lorentzian)
+	totalY += (np.array(fitY)-popt[2])
+	allHeights.append(popt[2])
+totalY = totalY+avg(allHeights)
+rp.plotData(xData, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+resid = np.array(yData)-totalY
+rp.plotData(xData, resid, 0, 0, dataLabel=r"Residuals", colour="Green", lines=True)
+rp.plotOutput(plotsFolder+"allFitsOAndResiduals.png")
