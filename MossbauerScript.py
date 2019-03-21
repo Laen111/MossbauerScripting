@@ -213,7 +213,7 @@ for i in rel(fittingOutput):
 f.close()
 
 
-# plot data and fits
+# plot fits and their errors
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
 for i in rel(fittingOutput):
@@ -235,7 +235,7 @@ if save == True:
 else:
  	rp.plotOutput()
 
-# plot fits and their errors
+# plot data and fits
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
 for i in rel(fittingOutput):
