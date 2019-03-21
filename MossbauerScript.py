@@ -37,8 +37,8 @@ def avg(array):
 # x0 is position of minimum, d is depth of minimum, a is vertical offset
 # migrated the fitting function to this file to leave 'backend files' unmodifed (and more generic)
 def lorentzian(x,x0,d,a):
-	numerator = -1/(np.pi * (np.pi*d)**(1/3))
-	denominator = (x-x0)**2 + (np.pi*d)**(-2/3)
+	numerator = 1/(np.pi**2)*d
+	denominator = (x-x0)**2 + (np.pi*d)**(-2)
 	return numerator/denominator + a
 
 #Takes 3 lists of Lorentzian parameters for each peak, mirrors the peaks
@@ -155,7 +155,7 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # organized the cuts and guesses into order, should be very accurate to true values
 cuts = [
 		[-7.5, -7.2],
-		[-6.9, -6.6],#[-7.0, -6.6],
+		[-7.0, -6.5],#[-7.0, -6.6],
 		[-6.3, -6.1],#[-6.4, -6.0],
 		[-5.9, -5.6],
 		[-5.3, -4.9],
@@ -195,16 +195,16 @@ xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
 xData = convertToVelocity(xData, [-11,11])
 
 # Plot Data:
-rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
 
 # Plot Fits:
 for i in rel(cuts):
 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i], guess=guesses[i], bounds=([cuts[i][0],20,100],[cuts[i][1],100,130]))
 	if i == 0:
-		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Green", lines=True)
+		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
 	else:
-		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Green", lines=True)
+		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
 
 rp.plotOutput()
 
