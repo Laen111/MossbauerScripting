@@ -20,6 +20,8 @@ e = 1.602176634*10**(-19) #C
 dataFolder = "./Data/"
 plotsFolder = "./Plots/"
 
+save = False
+
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Functions
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -84,7 +86,7 @@ def fitOneLorentzian(xData, yData, yErr=None, cut=[0,1], guess=None, bounds=(-np
 	popt, pcov = fd.fitting(xData, yData, lorentzian, eYs=yErr, initGuess=guess, bounds=bounds)
 	fitX = np.linspace(cut[0],cut[1],num=2000)
 	fitY = fd.fitYs(fitX, popt, lorentzian)
-	return [fitX, fitY, popt, pcov]
+	return [fitX, fitY, popt, pcov]	
 
 def convertToVelocity(xBins, lims=[-11,11]):
 	newXPoints = np.linspace(lims[0],lims[1],num=len(xBins))
@@ -183,56 +185,102 @@ guesses = [
 		[+6.51, 45, 110]
 		]
 
-
-#Good guesses (work for Jake)
-# cuts = [[6.2, 6.8], [5.6, 6.0], [5.10, 5.23], [4.63, 4.80], [3.95, 4.25], [3.4, 3.67]]
-# guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.17, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.51, 60, 100]]
-
-
 # Read in Data:
 dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
 xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
 xData = convertToVelocity(xData, [-11,11])
 
-# Plot Data:
 
 # # Plot Fits:
-rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
+
 for i in rel(cuts):
 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
+
 	if i == 0:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
 	else:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
-rp.plotOutput(plotsFolder+"FitData.png")
+
+# if save == True:
+# 	rp.plotOutput(plotsFolder+"FitData.png")
+# else:
+# 	rp.plotOutput()
 
 
-# Plot Fits separately:
-totalX = np.linspace(min(xData), max(xData), num=22*1000)
+
+# # Plot Fits separately:
+# totalX = np.linspace(min(xData), max(xData), num=22*1000)
+# for i in rel(cuts):
+# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
+# 	totalY = fd.fitYs(totalX, popt, lorentzian)
+
+# 	rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+# 	rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
+# 	rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+# 	rp.plotData([cuts[i][0],cuts[i][1]], [50,50], 0, 0, dataLabel="Fitting Range", colour="Green", lines=True)
+# 	if save == True:
+# 		rp.plotOutput(plotsFolder+"bounded_"+str(i)+"_fitLorenztian"+".png")
+# 	else:
+# 		rp.plotOutput()
+
+
+# # Plot Fits only:
+# rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+# totalY = np.linspace(0, 0, num=22*1000)
+# totalX = np.linspace(min(xData), max(xData), num=22*1000)
+# allHeights = []
+# #print(totalY)
+# for i in rel(cuts):
+# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
+# 	fitY = fd.fitYs(totalX, popt, lorentzian)
+# 	totalY += (np.array(fitY)-popt[2])
+# 	allHeights.append(popt[2])
+
+# totalY = totalY+avg(allHeights)
+# rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+# if save == True:
+# 	rp.plotOutput(plotsFolder+"allFitsOnlyFits.png")
+# else:
+# 	rp.plotOutput()
+
+# # Plot Fits over data:
+# rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+# rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
+# rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+# if save == True:
+# 	rp.plotOutput(plotsFolder+"allFitWithData.png")
+# else:
+# 	rp.plotOutput()
+
+# # Plot Fits over data with no error:
+# rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+# rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
+# rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+# if save == True:
+# 	rp.plotOutput(plotsFolder+"allFitWithDataNoError.png")
+# else:
+# 	rp.plotOutput()
+
+
+# Make a .dat file with a LaTeX table of all the fit parameters 
+fitParams = open("fitParamsTable.dat","w+")
+
+fitParams.write("\\begin{table}[] \n")
+fitParams.write("\\centering \n")
+fitParams.write("\\begin{tabular}{|c|c|c|c|}\\hline \n")
+fitParams.write("Fit Number & $x_0$ [mm/s] & d [counts] & a [counts] \\\\ \\hline \n")
+
 for i in rel(cuts):
-	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
-	totalY = fd.fitYs(totalX, popt, lorentzian)
+	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
+	fitParams.write(str(i)+" & "+str('%.2f'%(popt[0]))+"$\\pm$"+str('%.3f'%(m.sqrt(pcov[0][0])))+
+							" & "+str('%.2f'%(popt[1]))+"$\\pm$"+str('%.2f'%(m.sqrt(pcov[1][1])))+
+							" & "+str('%.2f'%(popt[2]))+"$\\pm$"+str('%.2f'%(m.sqrt(pcov[2][2])))+ 
+							"\\\\ \\hline \n")
 
-	rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
-	rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
-	rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
-	rp.plotData([cuts[i][0],cuts[i][1]], [50,50], 0, 0, dataLabel="Fitting Range", colour="Green", lines=True)
-	rp.plotOutput(plotsFolder+"bounded_"+str(i)+"_fitLorenztian"+".png")
-
-
-# Plot Fits only:
-rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
-totalY = np.linspace(0, 0, num=22*1000)
-totalX = np.linspace(min(xData), max(xData), num=22*1000)
-allHeights = []
-print(totalY)
-for i in rel(cuts):
-	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
-	fitY = fd.fitYs(totalX, popt, lorentzian)
-	totalY += (np.array(fitY)-popt[2])
-	allHeights.append(popt[2])
-
-totalY = totalY+avg(allHeights)
-rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
-rp.plotOutput(plotsFolder+"allFitsOnlyFits.png")
+fitParams.write("\\end{tabular} \n")
+fitParams.write("\\caption{Fit parameters for all 12 peaks.} \n")
+fitParams.write("\\label{table:my_label} \n")
+fitParams.write("\\end{table}")
+fitParams.close()
