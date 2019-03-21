@@ -168,20 +168,20 @@ cuts = [
 		[+6.2, +6.8]
 		]
 
-guesses = [
-		[-7.37, 45, 110],
-		[-6.76, 40, 110],
-		[-6.20, 30, 110],
-		[-5.73, 30, 110],
-		[-5.10, 40, 110],
-		[-4.48, 45, 110],
-		[+3.54, 45, 110],
-		[+4.11, 40, 110],
-		[+4.71, 30, 110],
-		[+5.17, 30, 110],
-		[+5.82, 40, 110],
-		[+6.51, 45, 110]
-		]
+# guesses = [
+# 		[-7.37, 45, 110],
+# 		[-6.76, 40, 110],
+# 		[-6.20, 30, 110],
+# 		[-5.73, 30, 110],
+# 		[-5.10, 40, 110],
+# 		[-4.48, 45, 110],
+# 		[+3.54, 45, 110],
+# 		[+4.11, 40, 110],
+# 		[+4.71, 30, 110],
+# 		[+5.17, 30, 110],
+# 		[+5.82, 40, 110],
+# 		[+6.51, 45, 110]
+# 		]
 
 
 #Good guesses (work for Jake)
@@ -197,10 +197,64 @@ xData = convertToVelocity(xData, [-11,11])
 # Plot Data:
 
 # # Plot Fits:
+# rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+# rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
+# for i in rel(cuts):
+# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
+# 	if i == 0:
+# 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+# 	else:
+# 		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
+# rp.plotOutput(plotsFolder+"FitData.png")
+
+
+# # Plot Fits separately:
+# totalX = np.linspace(min(xData), max(xData), num=22*1000)
+# for i in rel(cuts):
+# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
+# 	totalY = fd.fitYs(totalX, popt, lorentzian)
+
+# 	rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+# 	rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
+# 	rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+# 	rp.plotData([cuts[i][0],cuts[i][1]], [50,50], 0, 0, dataLabel="Fitting Range", colour="Green", lines=True)
+# 	rp.plotOutput(plotsFolder+"bounded_"+str(i)+"_fitLorenztian"+".png")
+
+
+# # Plot Fits only:
+# rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+# totalY = np.linspace(0, 0, num=22*1000)
+# totalX = np.linspace(min(xData), max(xData), num=22*1000)
+# allHeights = []
+# print(totalY)
+# for i in rel(cuts):
+# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
+# 	fitY = fd.fitYs(totalX, popt, lorentzian)
+# 	totalY += (np.array(fitY)-popt[2])
+# 	allHeights.append(popt[2])
+
+# totalY = totalY+avg(allHeights)
+# rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+# rp.plotOutput(plotsFolder+"allFitsOnlyFits.png")
+
+
+# plot raw data with error bars
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
+rp.plotOutput(plotsFolder+"DataErrorBars.png")
+
+
+# fit things
+fittingOutput = []
 for i in rel(cuts):
-	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
+	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
+	fittingOutput.append([cuts[i], fitX, fitY, popt, pcov])
+
+# plot data and fits
+rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
+for i in rel(fittingOutput):
+	cut, fitX, fitY, popt, pcov = fittingOutput[i]
 	if i == 0:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
 	else:
@@ -208,31 +262,27 @@ for i in rel(cuts):
 rp.plotOutput(plotsFolder+"FitData.png")
 
 
-# Plot Fits separately:
-totalX = np.linspace(min(xData), max(xData), num=22*1000)
-for i in rel(cuts):
-	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
-	totalY = fd.fitYs(totalX, popt, lorentzian)
-
-	rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
-	rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
-	rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
-	rp.plotData([cuts[i][0],cuts[i][1]], [50,50], 0, 0, dataLabel="Fitting Range", colour="Green", lines=True)
-	rp.plotOutput(plotsFolder+"bounded_"+str(i)+"_fitLorenztian"+".png")
-
-
-# Plot Fits only:
+# plot the fits together
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 totalY = np.linspace(0, 0, num=22*1000)
 totalX = np.linspace(min(xData), max(xData), num=22*1000)
 allHeights = []
-print(totalY)
-for i in rel(cuts):
-	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])#, guess=guesses[i], bounds=([cuts[i][0],-np.inf,100],[cuts[i][1],np.inf,140]))
+for i in rel(fittingOutput):
+	cut, fitX, fitY, popt, pcov = fittingOutput[i]
 	fitY = fd.fitYs(totalX, popt, lorentzian)
 	totalY += (np.array(fitY)-popt[2])
 	allHeights.append(popt[2])
-
 totalY = totalY+avg(allHeights)
 rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
 rp.plotOutput(plotsFolder+"allFitsOnlyFits.png")
+
+# print results to file
+f = open(dataFolder+"fittingresults.dat","w+")
+header = "Lower Cut\tUpper Cut\tx0\td\ta\tCovariant Matrix (formatted row1 row2 row3)\n"
+f.write(header)
+for i in rel(fittingOutput):
+	cut, fitX, fitY, popt, pcov = fittingOutput[i]
+	cov1, cov2, cov3 = pcov[0], pcov[1], pcov[2]
+	lineToWrite = str(cut[0]) + "\t" + str(cut[1]) + "\t" + str(popt[0]) + "\t" + str(popt[1]) + "\t" + str(popt[2]) + "\t" + str(cov1) + "\t" + str(cov2) + "\t" + str(cov3) + "\n"
+	f.write(lineToWrite)
+f.close()
