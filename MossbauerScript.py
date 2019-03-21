@@ -185,18 +185,10 @@ guesses = [
 		[+6.51, 45, 110]
 		]
 
-
-#Good guesses (work for Jake)
-# cuts = [[6.2, 6.8], [5.6, 6.0], [5.10, 5.23], [4.63, 4.80], [3.95, 4.25], [3.4, 3.67]]
-# guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.17, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.51, 60, 100]]
-
-
 # Read in Data:
 dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
 xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
 xData = convertToVelocity(xData, [-11,11])
-
-# Plot Data:
 
 
 # # Plot Fits:
@@ -208,10 +200,10 @@ for i in rel(cuts):
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
 	else:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Red", lines=True)
-# if save == True:
-# 	rp.plotOutput(plotsFolder+"FitData.png")
-# else:
-# 	rp.plotOutput()
+if save == True:
+	rp.plotOutput(plotsFolder+"FitData.png")
+else:
+	rp.plotOutput()
 
 
 
@@ -245,10 +237,10 @@ for i in rel(cuts):
 
 totalY = totalY+avg(allHeights)
 rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
-# if save == True:
-# 	rp.plotOutput(plotsFolder+"allFitsOnlyFits.png")
-# else:
-# 	rp.plotOutput()
+if save == True:
+	rp.plotOutput(plotsFolder+"allFitsOnlyFits.png")
+else:
+	rp.plotOutput()
 
 # Plot Fits over data:
 rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
@@ -264,6 +256,6 @@ rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
 rp.plotData(totalX, totalY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
 if save == True:
-	rp.plotOutput(plotsFolder+"allFitWithData.png")
+	rp.plotOutput(plotsFolder+"allFitWithDataNoError.png")
 else:
 	rp.plotOutput()
