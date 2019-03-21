@@ -37,7 +37,7 @@ def avg(array):
 # x0 is position of minimum, d is depth of minimum, a is vertical offset
 # migrated the fitting function to this file to leave 'backend files' unmodifed (and more generic)
 def lorentzian(x,x0,d,a):
-	numerator = -1/((np.pi**2)*d)
+	numerator = -1/(d*np.pi**2)
 	denominator = (x-x0)**2 + (np.pi*d)**(-2)
 	return numerator/denominator + a
 
