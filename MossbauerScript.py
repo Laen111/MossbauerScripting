@@ -33,6 +33,14 @@ def avg(array):
 		tally += elem
 	return tally/len(array)
 
+# the function that scipy will use to fit to
+# x0 is position of minimum, d is depth of minimum, a is vertical offset
+# migrated the fitting function to this file to leave 'backend files' unmodifed (and more generic)
+def lorentzian(x,x0,d,a):
+	numerator = -1/(np.pi * (np.pi*d)**(1/3))
+	denominator = (x-x0)**2 + (np.pi*d)**(-2/3)
+	return numerator/denominator + a
+
 #Takes 3 lists of Lorentzian parameters for each peak, mirrors the peaks
 #3 sets of [x0, d, a] where x0 is position of minimum, d is depth of minimum, a is vertical offset
 #Vertical offset should be same for each peak (or else it takes the average)
@@ -66,16 +74,17 @@ def readCSV(filename):
 # fits a single lorentzian based on the x cut data you provide
 # able to auto guess 'ideal' parameters based on the cut data
 # can override the auto guess by providing your own eg [1,5,10]
-def fitOneLorentzian(xData, yData, yErr=None, cut=[0,1], guess=None):
+def fitOneLorentzian(xData, yData, yErr=None, cut=[0,1], guess=None, bounds=(-np.inf,np.inf)):
 	cutX,cutY = fd.cutData(xData,yData,interval=cut)
 	if guess==None:
 		peakPos = cutX[cutY.index(min(cutY))]
 		peakHeight = avg(cutY)
 		peakDepth = peakHeight - min(cutY)
 		guess = [peakPos,peakDepth,peakHeight]
-	popt, pcov = fd.fitting(xData, yData, eYs=yErr, initGuess=guess)
-	fitY = fd.fitYs(cutX, popt)
-	return [cutX, fitY, popt, pcov]
+	popt, pcov = fd.fitting(xData, yData, lorentzian, eYs=yErr, initGuess=guess)
+	fitX = np.linspace(cut[0],cut[1],num=2000)
+	fitY = fd.fitYs(fitX, popt, lorentzian)
+	return [fitX, fitY, popt, pcov]
 
 def convertToVelocity(xBins, lims=[-11,11]):
 	newXPoints = np.linspace(lims[0],lims[1],num=len(xBins))
@@ -143,9 +152,45 @@ def convertToVelocity(xBins, lims=[-11,11]):
 # ################### End Fit six Lorentzians ####################
 
 
+# organized the cuts and guesses into order, should be very accurate to true values
+cuts = [
+		[-7.5, -7.2],
+		[-6.9, -6.6],#[-7.0, -6.6],
+		[-6.3, -6.1],#[-6.4, -6.0],
+		[-5.9, -5.6],
+		[-5.3, -4.9],
+		[-4.7, -4.3],
+		[+3.3, +3.7],
+		[+4.0, +4.2],#[+3.9, +4.3],
+		[+4.6, +4.8],#[+4.5, +4.9],
+		[+5.0, +5.4],
+		[+5.6, +6.1],
+		[+6.3, +6.7]#[+6.2, +6.8]
+		]
+
+guesses = [
+		[-7.37, 45, 110],
+		[-6.76, 40, 110],
+		[-6.20, 30, 110],
+		[-5.73, 30, 110],
+		[-5.10, 40, 110],
+		[-4.48, 45, 110],
+		[+3.54, 45, 110],# this one takes a lot longer to fit (more calls)
+		[+4.11, 40, 110],
+		[+4.71, 30, 110],
+		[+5.17, 30, 110],
+		[+5.82, 40, 110],
+		[+6.51, 45, 110]
+		]
+
+
+#Good guesses (work for Jake)
+# cuts = [[6.2, 6.8], [5.6, 6.0], [5.10, 5.23], [4.63, 4.80], [3.95, 4.25], [3.4, 3.67]]
+# guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.17, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.51, 60, 100]]
+
+
 # Read in Data:
 dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
-
 xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
 xData = convertToVelocity(xData, [-11,11])
 
@@ -153,55 +198,28 @@ xData = convertToVelocity(xData, [-11,11])
 rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
 rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
 
-# Fit Data:
-# cuts = [
-# 	[3.4,3.7],
-# 	[3.7,4.4],
-# 	[4.4,4.9],
-# 	#[5.0,5.3],
-# 	[5.4,6.1],
-# 	[6.1,6.7]]
-
-# organized the cuts and guesses into order
-cuts = [[-7.6, -7.1],
-		#[-6.85, -6.7],
-		[-6.3, -6.1],
-		[-5.8, -5.6],
-		#[-5.2, -5.0],
-		#[-4.6, -4.4],
-		[3.3, 3.7],
-		#[4.0, 4.25],
-		[4.6, 4.8],
-		[5.1, 5.3],
-		[5.6, 6.0],
-		[6.2, 6.8]]
-
-guesses = [[-7.4, 60, 120],
-		#[-6.75, 75, 100],
-		[-6.2, 80, 100],
-		[-5.7, 90, 120],
-		#[-5.1, 70, 100],
-		#[-4.5, 65, 100],
-		[3.45, 60, 100],
-		#[4.1, 55, 100],
-		[4.7, 85, 100],
-		[5.19, 88, 100],
-		[5.8, 71, 100],
-		[6.5, 70, 100]]
-
-
-#Good guesses (work for Jake)
-#cuts = [[6.2, 6.8], [5.6, 6.0], [5.10, 5.23], [4.63, 4.80], [3.95, 4.25], [3.4, 3.67]]
-#guesses = [[6.5, 70, 100], [5.8, 71, 100], [5.17, 88, 100], [4.7, 85, 100], [4.1, 55, 100], [3.51, 60, 100]]
-
-#rp.plotOutput()
-
 # Plot Fits:
 for i in rel(cuts):
-	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
+	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i], guess=guesses[i], bounds=([cuts[i][0],20,100],[cuts[i][1],100,130]))
 	if i == 0:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Green", lines=True)
 	else:
 		rp.plotData(fitX, fitY, 0, 0, dataLabel=None, colour="Green", lines=True)
 
 rp.plotOutput()
+
+
+# Plot Fits separately:
+# for i in rel(cuts):
+# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i], guess=guesses[i], bounds=([cuts[i][0],20,100],[cuts[i][1],100,130]))
+# 	print("guess:", guesses[i])
+# 	print("the fit is:", popt)
+
+# 	fitX = np.linspace(min(xData), max(xData), num=22*1000)
+# 	fitY = fd.fitYs(fitX, popt, lorentzian)
+
+# 	rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+# 	rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
+# 	rp.plotData(fitX, fitY, 0, 0, dataLabel=r"Fit Lorentzians", colour="Red", lines=True)
+# 	rp.plotData([cuts[i][0],cuts[i][1]], [50,50], 0, 0, dataLabel="Fitting Range", colour="Orange", lines=True)
+# 	rp.plotOutput()#plotsFolder+str(i)+"_fitLorenztian"+".png")

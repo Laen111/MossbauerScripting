@@ -31,31 +31,29 @@ def cutData(Xs, Ys, interval=[0,None], cutOn="x"):
 		return "Error", "Error"
 
 
-# the function that scipy will use to fit to
-# x0 is position of minimum, d is depth of minimum, a is vertical offset
-def func(x,x0,d,a):
-	numerator = -1/(np.pi * (np.pi*d)**(1/3))
-	denominator = (x-x0)**2 + (np.pi*d)**(-2/3)
-	return numerator/denominator + a
+# the default function that scipy will use to fit to
+def func(x,m,b):
+	return m*x + b
 
 # fitting making use of scipy curve_fit
 # dXs, dYs are arrays of the data to be fit
 # eYs is the error on Y measurements (a single value, or array of different errors)
 # initGuess is the inital guess for the algorithm, tweak if getting errors (array entry for each param in func)
 # guessBounds gives limits for the algorithm eg, guessBounds=(0,[4,7]) says param1 can search 0to4 and param2 can search 0to7
-def fitting(dXs, dYs, eYs=None, initGuess=None):
-	popt, pcov = curve_fit(func, dXs, dYs, p0=initGuess, sigma=eYs)
+# made scipy make more attempts at fitting to reduce it giving up too fast
+def fitting(dXs, dYs, function=func, eYs=None, initGuess=None, bounds=(-np.inf,np.inf), attempts=1000000):
+	popt, pcov = curve_fit(function, dXs, dYs, p0=initGuess, sigma=eYs, bounds=bounds, maxfev=attempts)
 	return popt, pcov
 
 # returns points of the function
-def fitYs(dXs, popt):
-	return func(dXs,*popt)#popt[0],popt[1],popt[2])
+def fitYs(dXs, popt, function=func):
+	return function(dXs,*popt)
 
-# creates test data to fit to using func and Y error provied
-# params is an array of paramters to use according to func()
-def testData(dXs, params, errY=1.0, seed=25478):
+# creates test data to fit to using function passed and Y error provied
+# params is an array of paramters to use according to function(x,*[params])
+def testData(dXs, params, function=func, errY=1.0, seed=25478):
 	np.random.seed(seed)
 	dYs = []
 	for x in dXs:
-		dYs.append(np.random.normal(loc=func(x,*params), scale=errY))
+		dYs.append(np.random.normal(loc=function(x,*params), scale=errY))
 	return dYs
