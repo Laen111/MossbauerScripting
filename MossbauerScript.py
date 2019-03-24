@@ -189,9 +189,13 @@ dat = readCSV(dataFolder+"Fe2O3_05-02-2019_new.csv")
 xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
 xData = convertToVelocity(xData, [-11,11])
 
+# plot raw data
+rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"Fe$_2$O$_3$ M\"ossbauer data")
+rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
+rp.plotOutput(plotsFolder+"Data.png")
 
 # plot raw data with error bars
-rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"Fe$_2$O$_3$ M\"ossbauer data using counting error")
 rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
 rp.plotOutput(plotsFolder+"DataErrorBars.png")
 
@@ -287,22 +291,22 @@ else:
 	rp.plotOutput()
 
 # Make a .dat file with a LaTeX table of all the fit parameters 
-fitParams = open("fitParamsTable.dat","w+")
+# fitParams = open("fitParamsTable.dat","w+")
 
-fitParams.write("\\begin{table}[] \n")
-fitParams.write("\\centering \n")
-fitParams.write("\\begin{tabular}{|c|c|c|c|}\\hline \n")
-fitParams.write("Fit Number & $x_0$ [mm/s] & d [counts] & a [counts] \\\\ \\hline \n")
+# fitParams.write("\\begin{table}[] \n")
+# fitParams.write("\\centering \n")
+# fitParams.write("\\begin{tabular}{|c|c|c|c|}\\hline \n")
+# fitParams.write("Fit Number & $x_0$ [mm/s] & d [counts] & a [counts] \\\\ \\hline \n")
 
-for i in rel(cuts):
-	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
-	fitParams.write(str(i)+" & "+str('%.2f'%(popt[0]))+"$\\pm$"+str('%.3f'%(m.sqrt(pcov[0][0])))+
-							" & "+str('%.2f'%(popt[1]))+"$\\pm$"+str('%.2f'%(m.sqrt(pcov[1][1])))+
-							" & "+str('%.2f'%(popt[2]))+"$\\pm$"+str('%.2f'%(m.sqrt(pcov[2][2])))+ 
-							"\\\\ \\hline \n")
+# for i in rel(cuts):
+# 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
+# 	fitParams.write(str(i)+" & "+str('%.2f'%(popt[0]))+"$\\pm$"+str('%.3f'%(m.sqrt(pcov[0][0])))+
+# 							" & "+str('%.2f'%(popt[1]))+"$\\pm$"+str('%.2f'%(m.sqrt(pcov[1][1])))+
+# 							" & "+str('%.2f'%(popt[2]))+"$\\pm$"+str('%.2f'%(m.sqrt(pcov[2][2])))+ 
+# 							"\\\\ \\hline \n")
 
-fitParams.write("\\end{tabular} \n")
-fitParams.write("\\caption{Fit parameters for all 12 peaks.} \n")
-fitParams.write("\\label{table:my_label} \n")
-fitParams.write("\\end{table}")
-fitParams.close()
+# fitParams.write("\\end{tabular} \n")
+# fitParams.write("\\caption{Fit parameters for all 12 peaks.} \n")
+# fitParams.write("\\label{table:my_label} \n")
+# fitParams.write("\\end{table}")
+# fitParams.close()
