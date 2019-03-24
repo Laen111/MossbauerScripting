@@ -20,7 +20,7 @@ e = 1.602176634*10**(-19) #C
 dataFolder = "./Data/"
 plotsFolder = "./Plots/"
 
-save = False
+save = True
 
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # Functions
@@ -190,12 +190,12 @@ xData, yData, yErr, time = dat[0], dat[1], dat[2], dat[3]
 xData = convertToVelocity(xData, [-11,11])
 
 # plot raw data
-rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"Fe$_2$O$_3$ M\"ossbauer data")
+rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"Fe$_2$O$_3$ Mossbauer data")
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
 rp.plotOutput(plotsFolder+"Data.png")
 
 # plot raw data with error bars
-rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"Fe$_2$O$_3$ M\"ossbauer data using counting error")
+rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"Fe$_2$O$_3$ Mossbauer data using counting error")
 rp.plotData(xData, yData, 0, yErr, dataLabel=r"$Fe_2O_3$", colour="Blue")
 rp.plotOutput(plotsFolder+"DataErrorBars.png")
 
