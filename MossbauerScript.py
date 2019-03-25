@@ -16,6 +16,7 @@ import matplotlib.pyplot as plt
 
 h = 6.62607015*10**(-34) #Js
 e = 1.602176634*10**(-19) #C
+hbar = 6.58*10**(-16) #eV s
 
 dataFolder = "./Data/"
 plotsFolder = "./Plots/"
@@ -205,6 +206,17 @@ for i in rel(cuts):
 	fitX, fitY, popt, pcov = fitOneLorentzian(xData, yData, yErr, cut=cuts[i])
 	fittingOutput.append([cuts[i], fitX, fitY, popt, pcov])
 
+# get the lifetime
+lifetimes = []
+for i in rel(fittingOutput):
+	cut, fitX, fitY, popt, pcov = fittingOutput[i]
+	d = ufloat(popt[1], m.sqrt(pcov[1][1]))
+	lifetime = (d*4.81*10**(-8)*3.14*hbar)/2
+	lifetimes.append(lifetime)
+
+print(avg(lifetimes)*10**9, "ns")
+
+
 # print results to file
 f = open(dataFolder+"fittingresults.dat","w+")
 header = "Lower Cut\tUpper Cut\tx0\td\ta\tCovariance Matrix(formatted row1 row2 row3)\n"
@@ -218,7 +230,7 @@ f.close()
 
 
 # plot data and fits
-rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data fit with error")
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
 for i in rel(fittingOutput):
 	cut, fitX, fitY, popt, pcov = fittingOutput[i]
@@ -240,7 +252,7 @@ else:
  	rp.plotOutput()
 
 # plot fits and their errors
-rp.plotInit(xAx=r"Velocity? $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data from previous group")
+rp.plotInit(xAx=r"Velocity $[\frac{mm}{s}]$", yAx=r"Counts [unitless]",plotTitle=r"$Fe_2O_3$ data fit")
 rp.plotData(xData, yData, 0, 0, dataLabel=r"$Fe_2O_3$", colour="Blue")
 for i in rel(fittingOutput):
 	cut, fitX, fitY, popt, pcov = fittingOutput[i]
@@ -310,3 +322,4 @@ else:
 # fitParams.write("\\label{table:my_label} \n")
 # fitParams.write("\\end{table}")
 # fitParams.close()
+
